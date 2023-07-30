@@ -11,19 +11,15 @@ public class TaskManager {
 
     private int generatedID = 0;
 
+    private int generateID() {
+        return ++generatedID;
+    }
+
     private HashMap<Integer, Task> taskStorage = new HashMap<>();
     private HashMap<Integer, Epic> epicStorage = new HashMap<>();
     private HashMap<Integer, Subtask> subtaskStorage = new HashMap<>();
 
 
-
-    // нужно здесь сделать для Task
-//    Получение списка всех задач. +
-//    Удаление всех задач. + (якобы)
-//    Получение по идентификатору. +
-//    Создание. Сам объект должен передаваться в качестве параметра. +
-//    Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра. +
-//    Удаление по идентификатору. + (якобы)
     public Task createTask(Task task) {
         int id = generateID();
         task.setId(id);
@@ -36,10 +32,10 @@ public class TaskManager {
     }
 
     public ArrayList<Task> getAllTasks() {
-        return new ArrayList(taskStorage.values());
+        return new ArrayList<>(taskStorage.values());
     }
 
-    public void removeAllTasks(Task task) {
+    public void removeAllTasks() {
         taskStorage.clear();
     }
 
@@ -58,77 +54,6 @@ public class TaskManager {
         taskStorage.remove(id);
     }
 
-    //
-
-
-    // нужно здесь сделать для Subtask
-    //    Получение списка всех задач.
-    //    Удаление всех задач.
-    //    Получение по идентификатору.
-    //    Создание. Сам объект должен передаваться в качестве параметра. +
-    //    Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
-    //    Удаление по идентификатору.
-
-    public Task createSubtask(Subtask subtask) {
-        int id = generateID();
-        subtask.setId(id);
-        subtaskStorage.put(id, subtask);
-        return subtask;
-    }
-
-    public Task getSubtaskByID(int id) {
-        return subtaskStorage.get(id);
-    }
-
-    public ArrayList<Task> getAllSubtasks() {
-        return new ArrayList(subtaskStorage.values());
-    }
-
-    public void removeAllSubtasks() {
-        subtaskStorage.clear();
-    }
-
-    public void updateSubtask(Subtask subtask) {
-        Subtask saved = subtaskStorage.get(subtask.getId());
-
-        if (saved == null) {
-            return;
-        }
-
-        subtaskStorage.put(subtask.getId(), subtask);
-    }
-
-    public void removeSubtaskByID(int subtaskID) {
-        Subtask subtask = subtaskStorage.get(subtaskID);
-
-        if (subtask != null) {
-            int epicID = subtask.getEpicID();
-            subtaskStorage.remove(subtaskID);
-
-            Epic epic = epicStorage.get(epicID);
-            if (epic != null) {
-                epic.getAllSubtaskIDs().remove(Integer.valueOf(subtaskID));
-                epicStorage.put(epicID, epic);
-            }
-        }
-
-//        subtaskStorage.remove(subtaskID);
-//        epicStorage.remove(epicStorage.get(subtaskID));
-//        updateEpic(epicStorage.get(subtaskID));
-
-    }
-
-    //
-
-    // нужно здесь сделать для Epic
-    //    Получение списка всех задач.
-    //    Удаление всех задач.
-    //    Получение по идентификатору.
-    //    Создание. Сам объект должен передаваться в качестве параметра.
-    //    Обновление. Новая версия объекта с верным идентификатором передаётся в виде параметра.
-    //    Удаление по идентификатору.
-
-
     public Epic createEpic(Epic epic) {
         int id = generateID();
         epic.setId(id);
@@ -136,17 +61,17 @@ public class TaskManager {
         return epic;
     }
 
-    public Task getEpicByID(int id) {
+    public Epic getEpicByID(int id) {
         return epicStorage.get(id);
     }
 
-    public ArrayList<Task> getAllEpics() {
-        return new ArrayList(epicStorage.values());
+    public ArrayList<Epic> getAllEpics() {
+        return new ArrayList<>(epicStorage.values());
     }
 
-    public void removeAllEpics(Epic epic) {
-        epicStorage.clear();// здесь мы сначала очистили эпики, а потом сабтаски
+    public void removeAllEpics() {
         subtaskStorage.clear();
+        epicStorage.clear();
     }
 
     public void updateEpic(Epic epic) {
@@ -159,20 +84,115 @@ public class TaskManager {
         epicStorage.put(epic.getId(), epic);
     }
 
-    public void removeEpic(int epicID) {
-        epicStorage.remove(epicID);
+    public void removeEpicByID(int epicID) {
+        Epic epic = epicStorage.remove(epicID);
+        for (Integer subtaskID : epic.getAllSubtaskIDs()) {
+            subtaskStorage.remove(subtaskID);
+        }
 
     }
 
+    private void actualizeEpic(int epicID, TaskManager taskManager) {
+        Epic epic = epicStorage.get(epicID);
 
-    //
-
-
-
-
-    private int generateID() {
-        return ++generatedID;
+        if (epic != null) {
+            epic.updateStatus(taskManager);
+            epicStorage.put(epicID, epic);
+        }
     }
 
+    private void updateEpicStatus(int epicID) {
+        Epic epic = epicStorage.get(epicID);
+        if (epic != null) {
+            boolean allSubtasksDone = true;
+            boolean anySubtaskInProgress = false;
 
+            for (Integer subtaskID : epic.getAllSubtaskIDs()) {
+                Subtask subtask = subtaskStorage.get(subtaskID);
+                if (subtask != null) {
+                    String subtaskStatus = subtask.getStatus();
+                    if (!"DONE".equals(subtaskStatus)) {
+                        allSubtasksDone = false;
+                        if ("IN_PROGRESS".equals(subtaskStatus)) {
+                            anySubtaskInProgress = true;
+                        }
+                    }
+                }
+            }
+
+            if (allSubtasksDone) {
+                epic.setStatus("DONE");
+            } else if (anySubtaskInProgress) {
+                epic.setStatus("IN_PROGRESS");
+            } else {
+                epic.setStatus("NEW");
+            }
+        }
+    }
+
+    public Subtask createSubtask(Subtask subtask) {
+        int id = generateID();
+        subtask.setId(id);
+        subtaskStorage.put(id, subtask);
+
+        Epic epic = epicStorage.get(subtask.getEpicID());
+        if (epic != null) {
+            epic.addSubtaskID(id);
+            updateEpicStatus(epic.getId());
+        }
+        return subtask;
+    }
+
+    public Subtask getSubtaskByID(int id) {
+        return subtaskStorage.get(id);
+    }
+
+    public ArrayList<Subtask> getAllSubtasks() {
+        return new ArrayList<>(subtaskStorage.values());
+    }
+
+    public void removeAllSubtasks() {
+        subtaskStorage.clear();
+        updateAllEpicsStatus();
+    }
+
+    public void updateSubtask(Subtask subtask) {
+        Subtask saved = subtaskStorage.get(subtask.getId());
+
+        if (saved == null) {
+            return;
+        }
+
+        subtaskStorage.put(subtask.getId(), subtask);
+
+        int epicID = subtask.getEpicID();
+        updateEpicStatus(epicID);
+        updateAllEpicsStatus();
+    }
+
+    public void removeSubtaskByID(int subtaskID) {
+        Subtask subtask = subtaskStorage.get(subtaskID);
+
+        if (subtask != null) {
+            int epicID = subtask.getEpicID();
+
+            Epic epic = epicStorage.get(epicID);
+            if (epic != null) {
+                epic.getAllSubtaskIDs().remove(Integer.valueOf(subtaskID));
+                if (epic.getAllSubtaskIDs().isEmpty()) {
+                    epic.setStatus("NEW");
+                } else {
+                    epic.updateStatus(this);
+                }
+            }
+            subtaskStorage.remove(subtaskID);
+        }
+        updateAllEpicsStatus();
+    }
+
+    public void updateAllEpicsStatus() {
+        for (Epic epic : epicStorage.values()) {
+            epic.updateStatus(this);
+        }
+    }
 }

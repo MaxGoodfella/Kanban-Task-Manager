@@ -62,24 +62,4 @@ public class Task {
                 ", status='" + status + '\'' +
                 '}';
     }
-
 }
-    // Почему их сравнение можно не создавать?
-    // Потому что в любом случае всё сравнение будет происходить через id, то есть другие поля не задействуются
-    // Соответственно, их сравнивать необязательно
-
-/*
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Task task = (Task) o;
-        return Objects.equals(id, task.id) && Objects.equals(name, task.name) && Objects.equals(description, task.description) && Objects.equals(status, task.status);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, status);
-    }
- */
-
