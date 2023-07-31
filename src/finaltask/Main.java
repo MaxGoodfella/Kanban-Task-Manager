@@ -84,7 +84,7 @@ public class Main {
 
         ArrayList<Epic> epics = taskManager.getAllEpics();
         for (Epic epic : epics) {
-            epic.updateStatus(taskManager);
+            taskManager.updateEpicStatus(epic.getId());
         }
 
 

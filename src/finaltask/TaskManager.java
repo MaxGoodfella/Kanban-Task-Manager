@@ -50,7 +50,6 @@ public class TaskManager {
     }
 
     public void removeTaskByID(int id) {
-        // int id = generateID();
         taskStorage.remove(id);
     }
 
@@ -92,16 +91,7 @@ public class TaskManager {
 
     }
 
-    private void actualizeEpic(int epicID, TaskManager taskManager) {
-        Epic epic = epicStorage.get(epicID);
-
-        if (epic != null) {
-            epic.updateStatus(taskManager);
-            epicStorage.put(epicID, epic);
-        }
-    }
-
-    private void updateEpicStatus(int epicID) {
+    protected void updateEpicStatus(int epicID) {
         Epic epic = epicStorage.get(epicID);
         if (epic != null) {
             boolean allSubtasksDone = true;
@@ -129,6 +119,16 @@ public class TaskManager {
             }
         }
     }
+
+    private void actualizeEpic(int epicID, TaskManager taskManager) {
+        Epic epic = epicStorage.get(epicID);
+
+        if (epic != null) {
+            updateEpicStatus(epicID);
+            epicStorage.put(epicID, epic);
+        }
+    }
+
 
     public Subtask createSubtask(Subtask subtask) {
         int id = generateID();
@@ -182,7 +182,7 @@ public class TaskManager {
                 if (epic.getAllSubtaskIDs().isEmpty()) {
                     epic.setStatus("NEW");
                 } else {
-                    epic.updateStatus(this);
+                    updateEpicStatus(epicID);
                 }
             }
             subtaskStorage.remove(subtaskID);
@@ -190,9 +190,9 @@ public class TaskManager {
         updateAllEpicsStatus();
     }
 
-    public void updateAllEpicsStatus() {
+    public void updateAllEpicsStatus() { //
         for (Epic epic : epicStorage.values()) {
-            epic.updateStatus(this);
+            updateEpicStatus(epic.getId());
         }
     }
 }
