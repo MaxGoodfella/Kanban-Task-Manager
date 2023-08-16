@@ -1,13 +1,15 @@
-package finaltask;
+package finaltask.manager;
 
 import finaltask.tasks.Epic;
 import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
+import finaltask.tasks.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class TaskManager {
+public class InMemoryTaskManager implements TaskManager{
 
     private int generatedID = 0;
 
@@ -19,7 +21,9 @@ public class TaskManager {
     private HashMap<Integer, Epic> epicStorage = new HashMap<>();
     private HashMap<Integer, Subtask> subtaskStorage = new HashMap<>();
 
+    private final HistoryManager historyManager = Managers.getHistoryDefault();
 
+    @Override
     public Task createTask(Task task) {
         int id = generateID();
         task.setId(id);
@@ -27,18 +31,24 @@ public class TaskManager {
         return task;
     }
 
+    @Override
     public Task getTaskByID(int id) {
-        return taskStorage.get(id);
+        Task task = taskStorage.get(id);
+        historyManager.addTask(task);
+        return task;
     }
 
+    @Override
     public ArrayList<Task> getAllTasks() {
         return new ArrayList<>(taskStorage.values());
     }
 
+    @Override
     public void removeAllTasks() {
         taskStorage.clear();
     }
 
+    @Override
     public void updateTask(Task task) {
         Task saved = taskStorage.get(task.getId());
 
@@ -49,10 +59,12 @@ public class TaskManager {
         taskStorage.put(task.getId(), task);
     }
 
+    @Override
     public void removeTaskByID(int id) {
         taskStorage.remove(id);
     }
 
+    @Override
     public Epic createEpic(Epic epic) {
         int id = generateID();
         epic.setId(id);
@@ -60,19 +72,25 @@ public class TaskManager {
         return epic;
     }
 
+    @Override
     public Epic getEpicByID(int id) {
-        return epicStorage.get(id);
+        Epic epic = epicStorage.get(id);
+        historyManager.addTask(epic);
+        return epic;
     }
 
+    @Override
     public ArrayList<Epic> getAllEpics() {
         return new ArrayList<>(epicStorage.values());
     }
 
+    @Override
     public void removeAllEpics() {
         subtaskStorage.clear();
         epicStorage.clear();
     }
 
+    @Override
     public void updateEpic(Epic epic) {
         Epic saved = epicStorage.get(epic.getId());
 
@@ -83,6 +101,7 @@ public class TaskManager {
         epicStorage.put(epic.getId(), epic);
     }
 
+    @Override
     public void removeEpicByID(int epicID) {
         Epic epic = epicStorage.remove(epicID);
         for (Integer subtaskID : epic.getAllSubtaskIDs()) {
@@ -91,7 +110,8 @@ public class TaskManager {
 
     }
 
-    protected void updateEpicStatus(int epicID) {
+    @Override
+    public void updateEpicStatus(int epicID) {
         Epic epic = epicStorage.get(epicID);
         if (epic != null) {
             boolean allSubtasksDone = true;
@@ -100,10 +120,12 @@ public class TaskManager {
             for (Integer subtaskID : epic.getAllSubtaskIDs()) {
                 Subtask subtask = subtaskStorage.get(subtaskID);
                 if (subtask != null) {
-                    String subtaskStatus = subtask.getStatus();
-                    if (!"DONE".equals(subtaskStatus)) {
+                    TaskStatus subtaskStatus = subtask.getStatus();
+                    // if (!"DONE".equals(subtaskStatus)) {
+                    if (subtaskStatus != TaskStatus.DONE) {
                         allSubtasksDone = false;
-                        if ("IN_PROGRESS".equals(subtaskStatus)) {
+                        // if ("IN_PROGRESS".equals(subtaskStatus)) {
+                        if (subtaskStatus == TaskStatus.IN_PROGRESS) {
                             anySubtaskInProgress = true;
                         }
                     }
@@ -111,16 +133,17 @@ public class TaskManager {
             }
 
             if (allSubtasksDone) {
-                epic.setStatus("DONE");
+                epic.setStatus(TaskStatus.DONE);
             } else if (anySubtaskInProgress) {
-                epic.setStatus("IN_PROGRESS");
+                epic.setStatus(TaskStatus.IN_PROGRESS);
             } else {
-                epic.setStatus("NEW");
+                epic.setStatus(TaskStatus.NEW);
             }
         }
     }
 
-    private void actualizeEpic(int epicID, TaskManager taskManager) {
+    @Override
+    public void actualizeEpic(int epicID, InMemoryTaskManager inMemoryTaskManager) {
         Epic epic = epicStorage.get(epicID);
 
         if (epic != null) {
@@ -130,6 +153,7 @@ public class TaskManager {
     }
 
 
+    @Override
     public Subtask createSubtask(Subtask subtask) {
         int id = generateID();
         subtask.setId(id);
@@ -143,19 +167,25 @@ public class TaskManager {
         return subtask;
     }
 
+    @Override
     public Subtask getSubtaskByID(int id) {
-        return subtaskStorage.get(id);
+        Subtask subtask = subtaskStorage.get(id);
+        historyManager.addTask(subtask);
+        return subtask;
     }
 
+    @Override
     public ArrayList<Subtask> getAllSubtasks() {
         return new ArrayList<>(subtaskStorage.values());
     }
 
+    @Override
     public void removeAllSubtasks() {
         subtaskStorage.clear();
         updateAllEpicsStatus();
     }
 
+    @Override
     public void updateSubtask(Subtask subtask) {
         Subtask saved = subtaskStorage.get(subtask.getId());
 
@@ -170,6 +200,7 @@ public class TaskManager {
         updateAllEpicsStatus();
     }
 
+    @Override
     public void removeSubtaskByID(int subtaskID) {
         Subtask subtask = subtaskStorage.get(subtaskID);
 
@@ -180,7 +211,7 @@ public class TaskManager {
             if (epic != null) {
                 epic.getAllSubtaskIDs().remove(Integer.valueOf(subtaskID));
                 if (epic.getAllSubtaskIDs().isEmpty()) {
-                    epic.setStatus("NEW");
+                    epic.setStatus(TaskStatus.NEW);
                 } else {
                     updateEpicStatus(epicID);
                 }
@@ -190,9 +221,15 @@ public class TaskManager {
         updateAllEpicsStatus();
     }
 
+    @Override
     public void updateAllEpicsStatus() { //
         for (Epic epic : epicStorage.values()) {
             updateEpicStatus(epic.getId());
         }
     }
+
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
+    }
+
 }

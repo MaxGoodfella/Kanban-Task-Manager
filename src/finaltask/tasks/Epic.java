@@ -1,7 +1,5 @@
 package finaltask.tasks;
 
-import finaltask.TaskManager;
-
 import java.util.ArrayList;
 
 public class Epic extends Task {
@@ -12,18 +10,17 @@ public class Epic extends Task {
         return subtaskIDs;
     }
 
-    public Epic(String name, String description, String status) {
+    public Epic(String name, String description, TaskStatus status) {
         super(name, description, status);
         this.subtaskIDs = new ArrayList<>();
     }
 
     public Epic(String name, String description) {
-        super(name, description);
+        super(name, description, TaskStatus.NEW);
         this.subtaskIDs = new ArrayList<>();
-        this.status = "NEW";
     }
 
-    public String getCurrentStatus() {
+    public TaskStatus getCurrentStatus() {
         return status;
     }
 
