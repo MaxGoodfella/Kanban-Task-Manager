@@ -5,6 +5,7 @@ import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
 
@@ -32,4 +33,6 @@ public interface TaskManager {
     void removeSubtaskByID(int subtaskID);
 
     void updateAllEpicsStatus();
+
+    List<Task> getHistory();
 }
