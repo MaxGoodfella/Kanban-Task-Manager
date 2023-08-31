@@ -21,7 +21,11 @@ public class InMemoryTaskManager implements TaskManager{
     private HashMap<Integer, Epic> epicStorage = new HashMap<>();
     private HashMap<Integer, Subtask> subtaskStorage = new HashMap<>();
 
-    private final HistoryManager historyManager = Managers.getHistoryDefault();
+    private final HistoryManager historyManager;
+
+    public InMemoryTaskManager(HistoryManager historyManager) {
+        this.historyManager = historyManager;
+    }
 
     @Override
     public Task createTask(Task task) {
@@ -62,6 +66,7 @@ public class InMemoryTaskManager implements TaskManager{
     @Override
     public void removeTaskByID(int id) {
         taskStorage.remove(id);
+        historyManager.remove(id);
     }
 
     @Override
@@ -106,7 +111,9 @@ public class InMemoryTaskManager implements TaskManager{
         Epic epic = epicStorage.remove(epicID);
         for (Integer subtaskID : epic.getAllSubtaskIDs()) {
             subtaskStorage.remove(subtaskID);
+            historyManager.remove(subtaskID);
         }
+        historyManager.remove(epicID);
 
     }
 
@@ -121,10 +128,8 @@ public class InMemoryTaskManager implements TaskManager{
                 Subtask subtask = subtaskStorage.get(subtaskID);
                 if (subtask != null) {
                     TaskStatus subtaskStatus = subtask.getStatus();
-                    // if (!"DONE".equals(subtaskStatus)) {
                     if (subtaskStatus != TaskStatus.DONE) {
                         allSubtasksDone = false;
-                        // if ("IN_PROGRESS".equals(subtaskStatus)) {
                         if (subtaskStatus == TaskStatus.IN_PROGRESS) {
                             anySubtaskInProgress = true;
                         }
@@ -144,6 +149,7 @@ public class InMemoryTaskManager implements TaskManager{
 
     @Override
     public void actualizeEpic(int epicID, InMemoryTaskManager inMemoryTaskManager) {
+
         Epic epic = epicStorage.get(epicID);
 
         if (epic != null) {
@@ -151,7 +157,6 @@ public class InMemoryTaskManager implements TaskManager{
             epicStorage.put(epicID, epic);
         }
     }
-
 
     @Override
     public Subtask createSubtask(Subtask subtask) {
@@ -217,6 +222,7 @@ public class InMemoryTaskManager implements TaskManager{
                 }
             }
             subtaskStorage.remove(subtaskID);
+            historyManager.remove(subtaskID);
         }
         updateAllEpicsStatus();
     }

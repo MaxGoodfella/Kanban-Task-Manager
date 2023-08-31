@@ -28,17 +28,17 @@ public class Main {
         epic1 = taskManager.createEpic(epic1);
         epic2 = taskManager.createEpic(epic2);
 
-        Subtask subtask1_1 = new Subtask("Подзадача №1", "Описание подзадачи №1", TaskStatus.NEW, epic1.getId());
-        Subtask subtask1_2 = new Subtask("Подзадача №2", "Описание подзадачи №2", TaskStatus.NEW, epic1.getId());
-        Subtask subtask2_1 = new Subtask("Подзадача №1", "Описание подзадачи №1", TaskStatus.NEW, epic2.getId());
+        Subtask subtask1_1 = new Subtask("Подзадача №1.1", "Описание подзадачи №1.1", TaskStatus.NEW, epic1.getId());
+        Subtask subtask1_2 = new Subtask("Подзадача №1.2", "Описание подзадачи №1.2", TaskStatus.NEW, epic1.getId());
+        Subtask subtask1_3 = new Subtask("Подзадача №1.3", "Описание подзадачи №1.3", TaskStatus.NEW, epic1.getId());
         subtask1_1 = taskManager.createSubtask(subtask1_1);
         subtask1_2 = taskManager.createSubtask(subtask1_2);
-        subtask2_1 = taskManager.createSubtask(subtask2_1);
+        subtask1_3 = taskManager.createSubtask(subtask1_3);
 
 
         epic1.addSubtaskID(subtask1_1.getId());
         epic1.addSubtaskID(subtask1_2.getId());
-        epic2.addSubtaskID(subtask2_1.getId());
+        epic2.addSubtaskID(subtask1_3.getId());
 
         taskManager.updateAllEpicsStatus();
 
@@ -55,7 +55,7 @@ public class Main {
 
         System.out.println(taskManager.getSubtaskByID(subtask1_1.getId()));
         System.out.println(taskManager.getSubtaskByID(subtask1_2.getId()));
-        System.out.println(taskManager.getSubtaskByID(subtask2_1.getId()));
+        System.out.println(taskManager.getSubtaskByID(subtask1_3.getId()));
         System.out.println(taskManager.getAllSubtasks());
         System.out.println();
 
@@ -81,7 +81,7 @@ public class Main {
         modifiedSubtask2.setStatus(TaskStatus.NEW);
         taskManager.updateSubtask(modifiedSubtask2);
 
-        Subtask modifiedSubtask3 = taskManager.getSubtaskByID(subtask2_1.getId());
+        Subtask modifiedSubtask3 = taskManager.getSubtaskByID(subtask1_3.getId());
         modifiedSubtask3.setStatus(TaskStatus.DONE);
         taskManager.updateSubtask(modifiedSubtask3);
 
@@ -104,52 +104,57 @@ public class Main {
 
         System.out.println(taskManager.getSubtaskByID(subtask1_1.getId()));
         System.out.println(taskManager.getSubtaskByID(subtask1_2.getId()));
-        System.out.println(taskManager.getSubtaskByID(subtask2_1.getId()));
+        System.out.println(taskManager.getSubtaskByID(subtask1_3.getId()));
         System.out.println(taskManager.getAllSubtasks());
         System.out.println();
 
-        // Оставил тут ради проверки. Если нужно, можно раскомментить и посмотреть, что оно работает :)
-    /*
+
         historyManager.addTask(taskManager.getTaskByID(task1.getId()));
         historyManager.addTask(taskManager.getTaskByID(task2.getId()));
+        historyManager.addTask(taskManager.getTaskByID(task2.getId()));
+        historyManager.addTask(taskManager.getTaskByID(task2.getId()));
+        historyManager.addTask(taskManager.getTaskByID(task2.getId()));
+        historyManager.addTask(taskManager.getSubtaskByID(subtask1_3.getId()));
+        historyManager.addTask(taskManager.getSubtaskByID(subtask1_3.getId()));
+        historyManager.addTask(taskManager.getSubtaskByID(subtask1_1.getId()));
+        historyManager.addTask(taskManager.getTaskByID(task1.getId()));
         historyManager.addTask(taskManager.getEpicByID(epic1.getId()));
         historyManager.addTask(taskManager.getEpicByID(epic2.getId()));
-        historyManager.addTask(taskManager.getSubtaskByID(subtask1_1.getId()));
+        historyManager.addTask(taskManager.getEpicByID(epic1.getId()));
+        historyManager.addTask(taskManager.getEpicByID(epic2.getId()));
+        historyManager.addTask(taskManager.getTaskByID(task1.getId()));
+        historyManager.addTask(taskManager.getTaskByID(task1.getId()));
+        historyManager.addTask(taskManager.getTaskByID(task1.getId()));
+        historyManager.addTask(taskManager.getSubtaskByID(subtask1_3.getId()));
+        historyManager.addTask(taskManager.getSubtaskByID(subtask1_3.getId()));
+        historyManager.addTask(taskManager.getTaskByID(task1.getId()));
+        historyManager.addTask(taskManager.getTaskByID(task1.getId()));
+        historyManager.addTask(taskManager.getEpicByID(epic2.getId()));
         historyManager.addTask(taskManager.getSubtaskByID(subtask1_2.getId()));
-        historyManager.addTask(taskManager.getSubtaskByID(subtask2_1.getId()));
 
-        System.out.println("История просмотров задач:");
-        List<Task> history = historyManager.getHistory();
-        for (Task task : history) {
+        System.out.println("История просмотров до удаления:");
+        List<Task> historyBefore = historyManager.getHistory();
+        for (Task task : historyBefore) {
             System.out.println(task);
         }
-    */
+
 
         taskManager.removeTaskByID(task1.getId());
-        System.out.println("Список задач после удаления:");
-        System.out.println(taskManager.getAllTasks());
 
-        taskManager.removeEpicByID(epic1.getId());
-        System.out.println("Список эпиков после удаления:");
-        System.out.println(taskManager.getAllEpics());
-
-        System.out.println("Список подзадач после удаления:");
-        System.out.println(taskManager.getAllSubtasks());
-        System.out.println();
-
-
-        historyManager.addTask(taskManager.getTaskByID(task1.getId()));
-        historyManager.addTask(taskManager.getTaskByID(task2.getId()));
-        historyManager.addTask(taskManager.getEpicByID(epic1.getId()));
-        historyManager.addTask(taskManager.getEpicByID(epic2.getId()));
-        historyManager.addTask(taskManager.getSubtaskByID(subtask1_1.getId()));
-        historyManager.addTask(taskManager.getSubtaskByID(subtask1_2.getId()));
-        historyManager.addTask(taskManager.getSubtaskByID(subtask2_1.getId()));
-
-        System.out.println("История просмотров задач:");
-        List<Task> history = historyManager.getHistory();
-        for (Task task : history) {
+        System.out.println("История просмотров после удаления (1):");
+        List<Task> historyAfter1 = historyManager.getHistory();
+        for (Task task : historyAfter1) {
             System.out.println(task);
         }
+
+
+        taskManager.removeEpicByID(epic1.getId());
+
+        System.out.println("История просмотров после удаления (2):");
+        List<Task> historyAfter2 = historyManager.getHistory();
+        for (Task task : historyAfter2) {
+            System.out.println(task);
+        }
+
     }
 }
