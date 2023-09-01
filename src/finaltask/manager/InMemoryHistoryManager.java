@@ -7,8 +7,8 @@ import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    Node first;
-    Node last;
+    private Node first;
+    private Node last;
     private final Map<Integer, Node> nodeMap = new HashMap<>();
 
     @Override
@@ -31,11 +31,15 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
+        /*
         Node node = nodeMap.remove(id);
         if (node == null) {
             return;
         }
         removeNode(node);
+         */
+
+        Optional.ofNullable(nodeMap.remove(id)).ifPresent(this::removeNode); // объяснение бы не помешало :)
 
     }
 
