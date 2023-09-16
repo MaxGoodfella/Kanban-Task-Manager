@@ -38,10 +38,31 @@ public class FileBackedTaskManagerTest {
         subtask1_3 = taskManager1.createSubtask(subtask1_3);
 
 
+        historyManager.addTask(taskManager1.getTaskByID(task1.getId()));
+        historyManager.addTask(taskManager1.getTaskByID(task2.getId()));
+        historyManager.addTask(taskManager1.getTaskByID(task2.getId()));
+        historyManager.addTask(taskManager1.getTaskByID(task2.getId()));
+        historyManager.addTask(taskManager1.getTaskByID(task2.getId()));
+        historyManager.addTask(taskManager1.getSubtaskByID(subtask1_3.getId()));
+        historyManager.addTask(taskManager1.getSubtaskByID(subtask1_3.getId()));
+        historyManager.addTask(taskManager1.getSubtaskByID(subtask1_1.getId()));
+        historyManager.addTask(taskManager1.getTaskByID(task1.getId()));
+        historyManager.addTask(taskManager1.getEpicByID(epic1.getId()));
+        historyManager.addTask(taskManager1.getEpicByID(epic2.getId()));
+        historyManager.addTask(taskManager1.getEpicByID(epic1.getId()));
+        historyManager.addTask(taskManager1.getEpicByID(epic2.getId()));
+        historyManager.addTask(taskManager1.getTaskByID(task1.getId()));
+        historyManager.addTask(taskManager1.getTaskByID(task1.getId()));
+        historyManager.addTask(taskManager1.getTaskByID(task1.getId()));
+        historyManager.addTask(taskManager1.getSubtaskByID(subtask1_3.getId()));
+        historyManager.addTask(taskManager1.getSubtaskByID(subtask1_3.getId()));
+        historyManager.addTask(taskManager1.getTaskByID(task1.getId()));
+        historyManager.addTask(taskManager1.getTaskByID(task1.getId()));
+        historyManager.addTask(taskManager1.getEpicByID(epic2.getId()));
+        historyManager.addTask(taskManager1.getSubtaskByID(subtask1_2.getId()));
 
-//        taskManager1.createEpic(epic1);
-//        taskManager1.createTask(task1);
-//        taskManager1.createSubtask(subtask1);
+
+
 
         FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(file);
 
