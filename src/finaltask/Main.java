@@ -1,8 +1,6 @@
 package finaltask;
 
-import finaltask.manager.HistoryManager;
-import finaltask.manager.Managers;
-import finaltask.manager.TaskManager;
+import finaltask.manager.*;
 import finaltask.tasks.Epic;
 import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
@@ -16,6 +14,7 @@ public class Main {
     public static void main(String[] args) {
         TaskManager taskManager = Managers.getDefault();
         HistoryManager historyManager = Managers.getHistoryDefault();
+        //
 
 
         Task task1 = new Task("Задача №1", "Описание задачи №1");
@@ -155,6 +154,11 @@ public class Main {
         for (Task task : historyAfter2) {
             System.out.println(task);
         }
+
+
+        // FileBackedTaskManagerTest.main(args);
+
+
 
     }
 }

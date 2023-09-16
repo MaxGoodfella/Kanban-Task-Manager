@@ -17,11 +17,11 @@ public class InMemoryTaskManager implements TaskManager{
         return ++generatedID;
     }
 
-    private HashMap<Integer, Task> taskStorage = new HashMap<>();
-    private HashMap<Integer, Epic> epicStorage = new HashMap<>();
-    private HashMap<Integer, Subtask> subtaskStorage = new HashMap<>();
+    protected HashMap<Integer, Task> taskStorage = new HashMap<>();
+    protected HashMap<Integer, Epic> epicStorage = new HashMap<>();
+    protected HashMap<Integer, Subtask> subtaskStorage = new HashMap<>();
 
-    private final HistoryManager historyManager;
+    protected final HistoryManager historyManager;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;

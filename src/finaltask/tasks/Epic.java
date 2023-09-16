@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Epic extends Task {
 
     private ArrayList<Integer> subtaskIDs;
+    // protected TaskType type; // возможно не нужно
 
     public ArrayList<Integer> getAllSubtaskIDs() {
         return subtaskIDs;
@@ -13,6 +14,7 @@ public class Epic extends Task {
     public Epic(String name, String description, TaskStatus status) {
         super(name, description, status);
         this.subtaskIDs = new ArrayList<>();
+        this.type = TaskType.EPIC;
     }
 
     public Epic(String name, String description) {
