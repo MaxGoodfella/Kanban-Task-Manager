@@ -1,12 +1,12 @@
 package finaltask.tasks;
 
 import java.util.ArrayList;
-import java.util.Objects;
+
 
 public class Epic extends Task {
 
     private ArrayList<Integer> subtaskIDs;
-    // protected TaskType type; // возможно не нужно
+
 
     public ArrayList<Integer> getAllSubtaskIDs() {
         return subtaskIDs;
@@ -35,20 +35,29 @@ public class Epic extends Task {
         subtaskIDs.remove(Integer.valueOf(subtaskID));
     }
 
-    /*
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Epic epic = (Epic) o;
-        return Objects.equals(subtaskIDs, epic.subtaskIDs);
+
+    public Boolean equals(Epic epicToCompare) {
+        if (!this.getId().equals(epicToCompare.getId())) {
+            return false;
+        }
+
+        if (!this.getName().equals(epicToCompare.getName())) {
+            return false;
+        }
+
+        if (!this.getDescription().equals(epicToCompare.getDescription())) {
+            return false;
+        }
+
+        if (!this.getType().equals(epicToCompare.getType())) {
+            return false;
+        }
+
+        if (!this.getStatus().equals(epicToCompare.getStatus())) {
+            return false;
+        }
+
+        return true;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), subtaskIDs);
-    }
-
-     */
 }

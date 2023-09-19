@@ -1,6 +1,5 @@
 package finaltask.tasks;
 
-import java.util.Objects;
 
 public class Task {
     protected Integer id;
@@ -76,19 +75,29 @@ public class Task {
                 '}';
     }
 
-    /*
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Task task = (Task) o;
-        return Objects.equals(id, task.id) && Objects.equals(name, task.name) && Objects.equals(description, task.description) && status == task.status && type == task.type;
+
+    public Boolean equals(Task taskToCompare) {
+        if (!this.getId().equals(taskToCompare.getId())) {
+            return false;
+        }
+
+        if (!this.getName().equals(taskToCompare.getName())) {
+            return false;
+        }
+
+        if (!this.getDescription().equals(taskToCompare.getDescription())) {
+            return false;
+        }
+
+        if (!this.getType().equals(taskToCompare.getType())) {
+            return false;
+        }
+
+        if (!this.getStatus().equals(taskToCompare.getStatus())) {
+            return false;
+        }
+
+        return true;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, status, type);
-    }
-
-     */
 }

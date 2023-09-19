@@ -16,31 +16,27 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager(File file, HistoryManager historyManager) {
         super(historyManager);
         this.file = file;
-        // this.file = new File("/Users/MaximGuseynov/dev3/sprint6/java-kanban/test.txt");
         this.historyManager = historyManager;
     }
 
 
     private void save() {
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            //сохраняем заголовок
+
             writer.write(csvManager.getHeading());
             writer.newLine();
 
-
-            // сохраняем список задач
             for (Task task : taskStorage.values()) {
                 writer.write(csvManager.toString(task));
                 writer.newLine();
             }
 
-            // сохраняем список эпиков
             for (Epic epic : epicStorage.values()) {
                 writer.write(csvManager.toString(epic));
                 writer.newLine();
             }
 
-            // сохраняем список подзадач
             for (Subtask subtask : subtaskStorage.values()) {
                 writer.write(csvManager.toString(subtask));
                 writer.newLine();
@@ -48,17 +44,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
             writer.newLine();
 
-            // сохраняем историю просмотров
             writer.write(csvManager.historyToString(historyManager));
-            writer.newLine(); // необязательно
+            writer.newLine();
 
 
         } catch (IOException e) {
-            // throw new IllegalArgumentException("Невозможно прочитать файл");
             throw new ManagerSaveException("Невозможно прочитать файл", e);
-            // здесь нужно будет создать своё исключение вместо IllegalArg...Exc...
-            // собственное непроверяемое исключение ManagerSaveException
         }
+
+
     }
 
     static FileBackedTaskManager loadFromFile(File file) {
@@ -70,7 +64,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String contentString = String.join("\n", content);
         String[] lines = contentString.split("\n");
 
-        // 1,TASK,Task1,NEW,Description task1,
 
         for (int i = 1; i < lines.length; i++) {
             String line = lines[i];
@@ -83,48 +76,36 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 TaskStatus status = TaskStatus.valueOf(parts[3]);
                 String description = parts[4];
 
-                Task task = null;
 
                 switch (type) {
                     case TASK:
-                        task = new Task(name, description, status);
+                        Task task = new Task(name, description, status);
+                        task.setId(Integer.valueOf(id));
                         manager.taskStorage.put(Integer.valueOf(id), task);
                         break;
                     case EPIC:
-                        task = new Epic(name, description, status);
-                        manager.epicStorage.put(Integer.valueOf(id), (Epic) task);
+                        Epic epic = new Epic(name, description, status);
+                        epic.setId(Integer.valueOf(id));
+                        manager.epicStorage.put(Integer.valueOf(id), epic);
                         break;
                     case SUBTASK:
                         int epicID = Integer.parseInt(parts[5]);
-                        task = new Subtask(name, description, status, epicID);
-                        manager.subtaskStorage.put(Integer.valueOf(id), (Subtask) task);
+                        Subtask subtask = new Subtask(name, description, status, epicID);
+                        subtask.setId(Integer.valueOf(id));
+                        manager.subtaskStorage.put(Integer.valueOf(id), subtask);
                         break;
                     default:
-                        // Обработка неизвестного типа задачи
                         break;
                 }
 
-                 // на случай переноса логики работы в CSVManager
-                // должно выглядеть примерно так, хотя хз
-
-//                String[] parts = line.split(",");
-//                String id = parts[0];
-//                Task task = csvManager.fromString(line);
-//                manager.taskStorage.put(Integer.valueOf(id), task);
-
             } else {
-                // если прочитали пустую строку, то следующая строка - список просмотров
                 String historyStr = lines[i + 1];
                 List<Integer> history = csvManager.historyFromString(historyStr);
                 manager.historyManager.setHistory(history);
                 break;
             }
-
         }
-
         return manager;
-
-
     }
 
 
@@ -132,7 +113,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public Task createTask(Task task) {
         Task t = super.createTask(task);
         save();
-        return t; // полагаю, что во всех методах ниже нужно сделать по этому образцу
+        return t;
     }
 
     @Override

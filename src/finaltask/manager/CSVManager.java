@@ -7,7 +7,6 @@ import java.util.List;
 
 public class CSVManager {
 
-    // private CSVManager() {}
 
     private static final String DELIMITER = ",";
 

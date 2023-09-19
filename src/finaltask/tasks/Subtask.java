@@ -1,11 +1,9 @@
 package finaltask.tasks;
 
-import java.util.Objects;
 
 public class Subtask extends Task {
 
     private int epicID;
-    // protected TaskType type; // возможно не нужно
 
 
     public Subtask(String name, String description, TaskStatus status, int epicID) {
@@ -29,20 +27,29 @@ public class Subtask extends Task {
         this.epicID = epicID;
     }
 
-    /*
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Subtask subtask = (Subtask) o;
-        return epicID == subtask.epicID;
+
+    public Boolean equals(Subtask subtaskToCompare) {
+        if (!this.getId().equals(subtaskToCompare.getId())) {
+            return false;
+        }
+
+        if (!this.getName().equals(subtaskToCompare.getName())) {
+            return false;
+        }
+
+        if (!this.getDescription().equals(subtaskToCompare.getDescription())) {
+            return false;
+        }
+
+        if (!this.getType().equals(subtaskToCompare.getType())) {
+            return false;
+        }
+
+        if (!this.getStatus().equals(subtaskToCompare.getStatus())) {
+            return false;
+        }
+
+        return true;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), epicID);
-    }
-
-     */
 }

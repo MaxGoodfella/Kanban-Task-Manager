@@ -6,7 +6,6 @@ import finaltask.tasks.Task;
 import finaltask.tasks.TaskStatus;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 public class FileBackedTaskManagerTest {
@@ -14,7 +13,6 @@ public class FileBackedTaskManagerTest {
     public static void main(String[] args) {
 
         File file = new File("./src/resources/sprint6/test.txt");
-        // File file = new File("/Users/MaximGuseynov/dev3/sprint6/java-kanban/test.txt");
 
 
         HistoryManager historyManager = new InMemoryHistoryManager();
@@ -68,64 +66,26 @@ public class FileBackedTaskManagerTest {
 
         FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(file);
 
-//        if (taskManager1.equals(taskManager2)) {
-//            System.out.println("Всё ок");
-//        } else {
-//            System.out.println("Не ок");
-//        }
 
         if (taskManager1.taskStorage.size() != taskManager2.taskStorage.size()) {
-            System.out.println("Не ок");
+            System.out.println("Ошибка сравнения задач");
             return;
         }
         if (taskManager1.epicStorage.size() != taskManager2.epicStorage.size()) {
-            System.out.println("Не ок");
+            System.out.println("Ошибка сравнения эпиков");
             return;
         }
         if (taskManager1.subtaskStorage.size() != taskManager2.subtaskStorage.size()) {
-            System.out.println("Не ок");
+            System.out.println("Ошибка сравнения подзадач");
             return;
         }
 
-        // оригинальная версия
-
-/*
-        for (Map.Entry<Integer, Task> taskEntry : taskManager1.taskStorage.entrySet()) {
-            // Task taskFromSecondStorage = taskManager2.taskStorage.getTaskByID(taskEntry.getKey());
-            Task taskFromSecondStorage = taskManager2.taskStorage.get(taskEntry.getKey());
-            if (!taskEntry.equals(taskFromSecondStorage)) {
-                System.out.println("Не ок");
-                return;
-            }
-        }// он начинает выдавать "не ок", начиная с этого цикла
-
-        for (Map.Entry<Integer, Epic> epicEntry : taskManager1.epicStorage.entrySet()) {
-            // Epic epicFromSecondStorage = taskManager2.epicStorage.getEpicByID(epicEntry.getKey());
-            Epic epicFromSecondStorage = taskManager2.epicStorage.get(epicEntry.getKey());
-            if (!epicEntry.equals(epicFromSecondStorage)) {
-                System.out.println("Не ок");
-                return;
-            }
-        }
-
-
-        for (Map.Entry<Integer, Subtask> subtaskEntry : taskManager1.subtaskStorage.entrySet()) {
-            // Subtask subtaskFromSecondStorage = taskManager2.subtaskStorage.getSubtaskByID(subtaskEntry.getKey());
-            Subtask subtaskFromSecondStorage = taskManager2.subtaskStorage.get(subtaskEntry.getKey());
-            if (!subtaskEntry.equals(subtaskFromSecondStorage)) {
-                System.out.println("Не ок");
-                return;
-            }
-        }
-
- */
-        /*
 
         for (Map.Entry<Integer, Task> taskEntry : taskManager1.taskStorage.entrySet()) {
             Integer taskId = taskEntry.getKey();
             Task taskFromSecondStorage = taskManager2.taskStorage.get(taskId);
             if (!taskEntry.getValue().equals(taskFromSecondStorage)) {
-                System.out.println("Не ок");
+                System.out.println("Ошибка сравнения задач");
                 return;
             }
         }
@@ -134,7 +94,7 @@ public class FileBackedTaskManagerTest {
             Integer epicId = epicEntry.getKey();
             Epic epicFromSecondStorage = taskManager2.epicStorage.get(epicId);
             if (!epicEntry.getValue().equals(epicFromSecondStorage)) {
-                System.out.println("Не ок");
+                System.out.println("Ошибка сравнения эпиков");
                 return;
             }
         }
@@ -143,44 +103,13 @@ public class FileBackedTaskManagerTest {
             Integer subtaskId = subtaskEntry.getKey();
             Subtask subtaskFromSecondStorage = taskManager2.subtaskStorage.get(subtaskId);
             if (!subtaskEntry.getValue().equals(subtaskFromSecondStorage)) {
-                System.out.println("Не ок");
+                System.out.println("Ошибка сравнения подзадач");
                 return;
             }
         }
 
-         */
 
-
-        //
-
-
-
-        for (Map.Entry<Integer, Task> taskEntry : taskManager1.taskStorage.entrySet()) {
-            Integer taskId = taskEntry.getKey();
-            Task taskFromSecondStorage = taskManager2.taskStorage.get(taskId);
-            if (!taskEntry.getValue().equals(taskFromSecondStorage)) {
-                System.out.println("Не ок");
-                return;
-            }
-        }
-
-        for (Map.Entry<Integer, Epic> epicEntry : taskManager1.epicStorage.entrySet()) {
-            Integer epicId = epicEntry.getKey();
-            Epic epicFromSecondStorage = taskManager2.epicStorage.get(epicId);
-            if (!epicEntry.getValue().equals(epicFromSecondStorage)) {
-                System.out.println("Не ок");
-                return;
-            }
-        }
-
-        for (Map.Entry<Integer, Subtask> subtaskEntry : taskManager1.subtaskStorage.entrySet()) {
-            Integer subtaskId = subtaskEntry.getKey();
-            Subtask subtaskFromSecondStorage = taskManager2.subtaskStorage.get(subtaskId);
-            if (!subtaskEntry.getValue().equals(subtaskFromSecondStorage)) {
-                System.out.println("Не ок");
-                return;
-            }
-        }
+        System.out.println("Запись и чтение прошли успешно: результаты совпадают");
 
 
     }
