@@ -9,12 +9,15 @@ import java.util.List;
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private File file;
-    private CSVManager csvManager = new CSVManager();
+    private static CSVManager csvManager = new CSVManager();
+
+    private HistoryManager historyManager;
 
     public FileBackedTaskManager(File file, HistoryManager historyManager) {
         super(historyManager);
         this.file = file;
         // this.file = new File("/Users/MaximGuseynov/dev3/sprint6/java-kanban/test.txt");
+        this.historyManager = historyManager;
     }
 
 
@@ -72,6 +75,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         for (int i = 1; i < lines.length; i++) {
             String line = lines[i];
             if (!line.isBlank()) {
+
                 String[] parts = line.split(",");
                 String id = parts[0];
                 TaskType type = TaskType.valueOf(parts[1]);
@@ -100,8 +104,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         break;
                 }
 
+                 // на случай переноса логики работы в CSVManager
+                // должно выглядеть примерно так, хотя хз
+
+//                String[] parts = line.split(",");
+//                String id = parts[0];
+//                Task task = csvManager.fromString(line);
+//                manager.taskStorage.put(Integer.valueOf(id), task);
+
             } else {
                 // если прочитали пустую строку, то следующая строка - список просмотров
+                String historyStr = lines[i + 1];
+                List<Integer> history = csvManager.historyFromString(historyStr);
+                manager.historyManager.setHistory(history);
                 break;
             }
 
