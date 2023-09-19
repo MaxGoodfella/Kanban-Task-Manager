@@ -84,23 +84,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 switch (type) {
                     case TASK:
                         task = new Task(name, description, status);
+                        manager.taskStorage.put(Integer.valueOf(id), task);
                         break;
                     case EPIC:
                         task = new Epic(name, description, status);
+                        manager.epicStorage.put(Integer.valueOf(id), (Epic) task);
                         break;
                     case SUBTASK:
                         int epicID = Integer.parseInt(parts[5]);
                         task = new Subtask(name, description, status, epicID);
+                        manager.subtaskStorage.put(Integer.valueOf(id), (Subtask) task);
                         break;
                     default:
                         // Обработка неизвестного типа задачи
                         break;
-                }
-
-                if (task != null) {
-                    manager.taskStorage.put(Integer.valueOf(id), task);
-                    manager.epicStorage.put(Integer.valueOf(id), (Epic) task);
-                    manager.subtaskStorage.put(Integer.valueOf(id), (Subtask) task);
                 }
 
             } else {
@@ -257,6 +254,5 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
         return lt;
     }
-
 
 }

@@ -11,7 +11,7 @@ public final class Managers {
 
     // private static final FileBackedTaskManager defaultFileBackedTaskManager = new FileBackedTaskManager(defaultHistoryManager);
 
-    private static final FileBackedTaskManager defaultFileBackedTaskManager = new FileBackedTaskManager(new File("test.txt"), defaultHistoryManager);
+    private static final FileBackedTaskManager defaultFileBackedTaskManager = new FileBackedTaskManager(new File("./resources/sprint6/test.txt"), defaultHistoryManager);
     // private static final FileBackedTaskManager defaultFileBackedTaskManager = new FileBackedTaskManager(new File("/Users/MaximGuseynov/dev3/sprint6/java-kanban/test.txt"), defaultHistoryManager);
 
 

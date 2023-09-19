@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class FileReader {
     public static ArrayList<String> readFileContents(String fileName) {
-        String path = "./resources/sprint6/" + fileName;
+        String path = "./src/resources/sprint6/" + fileName;
         try {
             return new ArrayList<>(Files.readAllLines(Path.of(path)));
         } catch (IOException e) {
