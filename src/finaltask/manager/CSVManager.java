@@ -17,6 +17,8 @@ public class CSVManager {
                 task.getName() + DELIMITER +
                 task.getStatus() + DELIMITER +
                 task.getDescription() + DELIMITER;
+        // Артем, видел твой коммент про StringJoiner, но пока не знаю, как его делать, поэтому оставил как есть)
+
 
         if (task.getType() == TaskType.SUBTASK) {
             result = result + ((Subtask) task).getEpicID();
@@ -25,8 +27,7 @@ public class CSVManager {
     }
 
 
-    public Task fromString(String taskStr) {
-
+    public Task fromString(String taskStr, FileBackedTaskManager manager) {
         String[] parts = taskStr.split(DELIMITER);
         int id = Integer.parseInt(parts[0]);
         TaskType type = TaskType.valueOf(parts[1]);
@@ -34,25 +35,26 @@ public class CSVManager {
         TaskStatus status = TaskStatus.valueOf(parts[3]);
         String description = parts[4];
 
-        Task task;
-
         switch (type) {
             case TASK:
-                task = new Task(name, description, status);
-                break;
+                Task task = new Task(name, description, status);
+                task.setId(id);
+                manager.taskStorage.put(id, task);
+                return task;
             case EPIC:
-                task = new Epic(name, description, status);
-                break;
+                Epic epic = new Epic(name, description, status);
+                epic.setId(id);
+                manager.epicStorage.put(id, epic);
+                return epic;
             case SUBTASK:
                 int epicID = Integer.parseInt(parts[5]);
-                task = new Subtask(name, description, status, epicID);
-                break;
+                Subtask subtask = new Subtask(name, description, status, epicID);
+                subtask.setId(id);
+                manager.subtaskStorage.put(id, subtask);
+                return subtask;
             default:
                 throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
         }
-
-        task.setId(id);
-        return task;
     }
 
 

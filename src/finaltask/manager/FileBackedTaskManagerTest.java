@@ -17,7 +17,8 @@ public class FileBackedTaskManagerTest {
 
         HistoryManager historyManager = new InMemoryHistoryManager();
 
-        FileBackedTaskManager taskManager1 = new FileBackedTaskManager(file, historyManager);
+
+        FileBackedTaskManager taskManager1 = FileBackedTaskManager.loadFromFile(file, historyManager);
 
 
         Task task1 = new Task("Задача №1", "Описание задачи №1");
@@ -62,9 +63,7 @@ public class FileBackedTaskManagerTest {
         historyManager.addTask(taskManager1.getSubtaskByID(subtask1_2.getId()));
 
 
-
-
-        FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(file);
+        FileBackedTaskManager taskManager2 = FileBackedTaskManager.loadFromFile(file, historyManager);
 
 
         if (taskManager1.taskStorage.size() != taskManager2.taskStorage.size()) {

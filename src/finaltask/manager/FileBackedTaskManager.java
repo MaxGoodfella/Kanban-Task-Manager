@@ -11,12 +11,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private File file;
     private static CSVManager csvManager = new CSVManager();
 
-    private HistoryManager historyManager;
-
     public FileBackedTaskManager(File file, HistoryManager historyManager) {
         super(historyManager);
         this.file = file;
-        this.historyManager = historyManager;
     }
 
 
@@ -45,68 +42,39 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             writer.newLine();
 
             writer.write(csvManager.historyToString(historyManager));
-            writer.newLine();
 
 
         } catch (IOException e) {
-            throw new ManagerSaveException("Невозможно прочитать файл", e);
+            throw new ManagerSaveException("Невозможно записать файл", e);
         }
 
 
     }
 
-    static FileBackedTaskManager loadFromFile(File file) {
+    public static FileBackedTaskManager loadFromFile(File file, HistoryManager historyManager) {
 
         FileBackedTaskManager manager = new FileBackedTaskManager(file, new InMemoryHistoryManager());
 
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 
-        ArrayList<String> content = FileReader.readFileContents(file.getName());
-        String contentString = String.join("\n", content);
-        String[] lines = contentString.split("\n");
+            String line = reader.readLine();
 
-
-        for (int i = 1; i < lines.length; i++) {
-            String line = lines[i];
-            if (!line.isBlank()) {
-
-                String[] parts = line.split(",");
-                String id = parts[0];
-                TaskType type = TaskType.valueOf(parts[1]);
-                String name = parts[2];
-                TaskStatus status = TaskStatus.valueOf(parts[3]);
-                String description = parts[4];
-
-
-                switch (type) {
-                    case TASK:
-                        Task task = new Task(name, description, status);
-                        task.setId(Integer.valueOf(id));
-                        manager.taskStorage.put(Integer.valueOf(id), task);
-                        break;
-                    case EPIC:
-                        Epic epic = new Epic(name, description, status);
-                        epic.setId(Integer.valueOf(id));
-                        manager.epicStorage.put(Integer.valueOf(id), epic);
-                        break;
-                    case SUBTASK:
-                        int epicID = Integer.parseInt(parts[5]);
-                        Subtask subtask = new Subtask(name, description, status, epicID);
-                        subtask.setId(Integer.valueOf(id));
-                        manager.subtaskStorage.put(Integer.valueOf(id), subtask);
-                        break;
-                    default:
-                        break;
+            while ((line = reader.readLine()) != null) {
+                if (!line.isBlank()) {
+                    Task task = csvManager.fromString(line, manager);
+                } else {
+                    String historyStr = reader.readLine();
+                    List<Integer> history = csvManager.historyFromString(historyStr);
+                    manager.historyManager.setHistory(history);
+                    break;
                 }
-
-            } else {
-                String historyStr = lines[i + 1];
-                List<Integer> history = csvManager.historyFromString(historyStr);
-                manager.historyManager.setHistory(history);
-                break;
             }
+        } catch (IOException e) {
+            throw new ManagerSaveException("Невозможно прочитать файл", e);
         }
         return manager;
     }
+
 
 
     @Override

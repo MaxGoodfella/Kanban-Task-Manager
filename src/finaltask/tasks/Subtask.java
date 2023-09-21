@@ -23,10 +23,6 @@ public class Subtask extends Task {
         return epicID;
     }
 
-    public void setEpicID(int epicID) {
-        this.epicID = epicID;
-    }
-
 
     public Boolean equals(Subtask subtaskToCompare) {
         if (!this.getId().equals(subtaskToCompare.getId())) {
