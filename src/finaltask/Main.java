@@ -6,6 +6,10 @@ import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
 import finaltask.tasks.TaskStatus;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +18,6 @@ public class Main {
     public static void main(String[] args) {
         TaskManager taskManager = Managers.getDefault();
         HistoryManager historyManager = Managers.getHistoryDefault();
-        //
 
 
         Task task1 = new Task("Задача №1", "Описание задачи №1");
@@ -155,10 +158,18 @@ public class Main {
             System.out.println(task);
         }
 
-
-        // FileBackedTaskManagerTest.main(args);
-
-
+//
+//        LocalDateTime startTime = LocalDateTime.now();
+//
+//        long duration = 90;
+//
+//        LocalDateTime endTime = startTime.plus(90, ChronoUnit.MINUTES);
+//
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//        System.out.println(startTime.format(formatter));
+//
+//
+//        // последующий метод getEndTime() нужно будет положить в класс задач
 
     }
 }

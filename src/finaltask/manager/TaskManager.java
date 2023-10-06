@@ -21,7 +21,7 @@ public interface TaskManager {
     ArrayList<Epic> getAllEpics();
     void removeAllEpics();
     void updateEpic(Epic epic);
-    void removeEpicByID(int epicID);
+    int removeEpicByID(int epicID);
     void updateEpicStatus(int epicID);
     void actualizeEpic(int epicID, InMemoryTaskManager inMemoryTaskManager);
 

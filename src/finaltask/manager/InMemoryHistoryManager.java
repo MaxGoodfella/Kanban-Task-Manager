@@ -1,5 +1,7 @@
 package finaltask.manager;
 
+import finaltask.tasks.Epic;
+import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
 
 import java.util.*;
@@ -31,6 +33,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
 
         int id = task.getId();
+
         remove(id);
         linkLast(task);
         nodeMap.put(id, last);
@@ -39,16 +42,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        /*
-        Node node = nodeMap.remove(id);
-        if (node == null) {
-            return;
-        }
-        removeNode(node);
-         */
-
-        Optional.ofNullable(nodeMap.remove(id)).ifPresent(this::removeNode); // объяснение бы не помешало :)
-
+        Optional.ofNullable(nodeMap.remove(id)).ifPresent(this::removeNode);
     }
 
     private void removeNode(Node node) {

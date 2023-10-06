@@ -9,7 +9,7 @@ public final class Managers {
     private static final HistoryManager defaultHistoryManager = new InMemoryHistoryManager();
     private static final TaskManager defaultTaskManager = new InMemoryTaskManager(defaultHistoryManager);
 
-    private static final FileBackedTaskManager defaultFileBackedTaskManager = new FileBackedTaskManager(new File("./resources/sprint6/test.txt"), defaultHistoryManager);
+    private static final FileBackedTaskManager defaultFileBackedTaskManager = new FileBackedTaskManager(new File("./Users/MaximGuseynov/dev3/sprint7/java-kanban/src/resources/sprint7/test.txt"), defaultHistoryManager);
 
 
     public static TaskManager getDefault() {
@@ -20,4 +20,7 @@ public final class Managers {
         return defaultHistoryManager;
     }
 
+    public static FileBackedTaskManager getDefaultFileBackedTaskManager() {
+        return defaultFileBackedTaskManager;
+    }
 }

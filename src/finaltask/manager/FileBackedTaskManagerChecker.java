@@ -8,11 +8,11 @@ import finaltask.tasks.TaskStatus;
 import java.io.File;
 import java.util.Map;
 
-public class FileBackedTaskManagerTest {
+public class FileBackedTaskManagerChecker {
 
     public static void main(String[] args) {
 
-        File file = new File("./src/resources/sprint6/test.txt");
+        File file = new File("/Users/MaximGuseynov/dev3/sprint7/java-kanban/src/resources/sprint7/test.txt");
 
 
         HistoryManager historyManager = new InMemoryHistoryManager();

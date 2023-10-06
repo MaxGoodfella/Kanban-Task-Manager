@@ -17,7 +17,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
 
-    private void save() {
+    public void save() {
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
 
@@ -47,7 +47,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new ManagerSaveException("Невозможно записать файл", e);
         }
-
 
     }
 
@@ -150,9 +149,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void removeEpicByID(int epicID) {
+    public int removeEpicByID(int epicID) {
         super.removeEpicByID(epicID);
         save();
+        return epicID;
     }
 
     @Override
