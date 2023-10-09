@@ -14,7 +14,7 @@ public interface TaskManager {
     ArrayList<Task> getAllTasks();
     void removeAllTasks();
     void updateTask(Task task);
-    void removeTaskByID(int id);
+    int removeTaskByID(int id);
 
     Epic createEpic(Epic epic);
     Epic getEpicByID(int id);
@@ -24,15 +24,14 @@ public interface TaskManager {
     int removeEpicByID(int epicID);
     void updateEpicStatus(int epicID);
     void actualizeEpic(int epicID, InMemoryTaskManager inMemoryTaskManager);
+    void updateAllEpicsStatus();
 
     Subtask createSubtask(Subtask subtask);
     Subtask getSubtaskByID(int id);
     ArrayList<Subtask> getAllSubtasks();
     void removeAllSubtasks();
     void updateSubtask(Subtask subtask);
-    void removeSubtaskByID(int subtaskID);
-
-    void updateAllEpicsStatus();
+    int removeSubtaskByID(int subtaskID);
 
     List<Task> getHistory();
 

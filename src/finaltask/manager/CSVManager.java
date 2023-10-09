@@ -17,7 +17,6 @@ public class CSVManager {
                 task.getName() + DELIMITER +
                 task.getStatus() + DELIMITER +
                 task.getDescription() + DELIMITER;
-        // Артем, видел твой коммент про StringJoiner, но пока не знаю, как его делать, поэтому оставил как есть)
 
 
         if (task.getType() == TaskType.SUBTASK) {
@@ -73,6 +72,9 @@ public class CSVManager {
 
 
     public List<Integer> historyFromString(String historyStr) {
+        if (historyStr == null) {
+            return new ArrayList<>();
+        }
         List<Integer> history = new ArrayList<>();
         String[] historyItems = historyStr.split(DELIMITER);
         for (String historyItem : historyItems) {

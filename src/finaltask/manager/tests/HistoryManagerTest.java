@@ -1,13 +1,13 @@
 package finaltask.manager.tests;
 
 import finaltask.manager.HistoryManager;
-import finaltask.manager.InMemoryHistoryManager;
 import finaltask.manager.Managers;
 import finaltask.manager.TaskManager;
 import finaltask.tasks.Epic;
 import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
 import finaltask.tasks.TaskStatus;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class InMemoryHistoryManagerTest extends InMemoryHistoryManager {
+class HistoryManagerTest {
 
     private HistoryManager historyManager;
 
@@ -52,6 +52,8 @@ class InMemoryHistoryManagerTest extends InMemoryHistoryManager {
 
     @Test
     void testGetHistoryWhenOneTaskAdded() {
+//        task = new Task("Task 1", "Description 1");
+//        task = taskManager.createTask(task);
         historyManager.addTask(task);
         List<Task> history = historyManager.getHistory();
         assertNotNull(history, "История не пустая.");
@@ -60,6 +62,11 @@ class InMemoryHistoryManagerTest extends InMemoryHistoryManager {
 
     @Test
     void testGetHistoryWithoutDuplicates() {
+//        task = new Task("Task 1", "Description 1");
+//        task = taskManager.createTask(task);
+//
+//        epic = new Epic("Epic 1", "Description 1");
+//        epic = taskManager.createEpic(epic);
 
         historyManager.addTask(task);
         historyManager.addTask(task);
@@ -90,6 +97,14 @@ class InMemoryHistoryManagerTest extends InMemoryHistoryManager {
         List<Task> history = historyManager.getHistory();
         assertNotNull(history, "История не пустая");
         assertEquals(1, history.size(), "История не соответствует размеру");
+    }
+
+    @AfterEach
+    void clean() {
+
+        historyManager.remove(taskManager.removeTaskByID(task.getId()));
+        historyManager.remove(taskManager.removeEpicByID(epic.getId()));
+        historyManager.remove(taskManager.removeSubtaskByID(subtask.getId()));
     }
 
 }

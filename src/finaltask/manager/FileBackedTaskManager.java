@@ -9,7 +9,7 @@ import java.util.List;
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private File file;
-    private static CSVManager csvManager = new CSVManager();
+    public static CSVManager csvManager = new CSVManager();
 
     public FileBackedTaskManager(File file, HistoryManager historyManager) {
         super(historyManager);
@@ -56,15 +56,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
 
-            String line = reader.readLine();
+            String line;
+
+            reader.readLine();
 
             while ((line = reader.readLine()) != null) {
                 if (!line.isBlank()) {
-                    Task task = csvManager.fromString(line, manager);
+                    csvManager.fromString(line, manager);
                 } else {
                     String historyStr = reader.readLine();
-                    List<Integer> history = csvManager.historyFromString(historyStr);
-                    manager.historyManager.setHistory(history);
+                    List<Integer> historyIDs = csvManager.historyFromString(historyStr);
+                    for (Integer id : historyIDs) {
+                        if (id == 0) {
+                            break;
+                        }
+
+                        if (manager.taskStorage.containsKey(id)) {
+                            manager.getTaskByID(id);
+                        } else if (manager.subtaskStorage.containsKey(id)) {
+                            manager.getSubtaskByID(id);
+                        } else if (manager.epicStorage.containsKey(id)) {
+                            manager.getEpicByID(id);
+                        }
+                    }
+                    manager.historyManager.setHistory(historyIDs);
                     break;
                 }
             }
@@ -110,9 +125,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void removeTaskByID(int id) {
+    public int removeTaskByID(int id) {
         super.removeTaskByID(id);
         save();
+        return id;
     }
 
     @Override
@@ -201,9 +217,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void removeSubtaskByID(int subtaskID) {
+    public int removeSubtaskByID(int subtaskID) {
         super.removeSubtaskByID(subtaskID);
         save();
+        return subtaskID;
     }
 
     @Override

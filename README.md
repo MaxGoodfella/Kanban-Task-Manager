@@ -6,4 +6,5 @@ Repository for homework project.
 Комментарий: 
 1) Нужна помощь в классе FileBackedTaskManagerTest, не получается организовать проверку на выбрасывание/невыбрасывания
 исключений;
-2) 
+2) Нужно помощь с методом testGetHistory() в классе TaskManagerTest (закомментил описание проблемы); 
+3) 
