@@ -25,17 +25,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             writer.newLine();
 
             for (Task task : taskStorage.values()) {
-                writer.write(csvManager.toString(task));
+                writer.write(csvManager.taskToString(task));
                 writer.newLine();
             }
 
             for (Epic epic : epicStorage.values()) {
-                writer.write(csvManager.toString(epic));
+                writer.write(csvManager.taskToString(epic));
                 writer.newLine();
             }
 
             for (Subtask subtask : subtaskStorage.values()) {
-                writer.write(csvManager.toString(subtask));
+                writer.write(csvManager.taskToString(subtask));
                 writer.newLine();
             }
 
@@ -62,7 +62,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
             while ((line = reader.readLine()) != null) {
                 if (!line.isBlank()) {
-                    csvManager.fromString(line, manager);
+                    csvManager.taskFromString(line, manager);
                 } else {
                     String historyStr = reader.readLine();
                     List<Integer> historyIDs = csvManager.historyFromString(historyStr);
@@ -234,6 +234,43 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         List<Task> lt = super.getHistory();
         save();
         return lt;
+    }
+
+    @Override
+    public void calculateEpicStartTime(int epicId) {
+        super.calculateEpicStartTime(epicId);
+        save();
+    }
+
+    @Override
+    public void calculateEpicDuration(int epicId) {
+        super.calculateEpicDuration(epicId);
+        save();
+    }
+
+    @Override
+    public void calculateEpicEndTime(int epicId) {
+        super.calculateEpicEndTime(epicId);
+        save();
+    }
+
+    @Override
+    public List<Subtask> getEpicSubtasksByEpicID(int epicID) {
+        List<Subtask> esbeid = super.getEpicSubtasksByEpicID(epicID);
+        save();
+        return esbeid;
+    }
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        List<Task> pt = super.getPrioritizedTasks();
+        save();
+        return pt;
+    }
+
+    @Override
+    public boolean isIntersection(Task task) {
+        return super.isIntersection(task);
     }
 
 }

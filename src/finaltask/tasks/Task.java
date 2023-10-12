@@ -1,7 +1,9 @@
 package finaltask.tasks;
 
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Task {
@@ -11,9 +13,12 @@ public class Task {
     protected TaskStatus status;
     protected TaskType type;
     protected LocalDateTime startTime;
-    protected int duration;
+    protected Duration duration;
     protected LocalDateTime endTime;
 
+    public Task() {
+
+    }
 
     public Task(String name, String description, TaskStatus status) {
         this.name = name;
@@ -30,10 +35,10 @@ public class Task {
         this.type = TaskType.TASK;
     }
 
-    public Task(String name, String description, LocalDateTime startTime, Integer duration, LocalDateTime endTime) {
+    public Task(String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration) {
         this.name = name;
         this.description = description;
-        this.status = TaskStatus.NEW;
+        this.status = status;
         this.type = TaskType.TASK;
         this.startTime = startTime;
         this.duration = duration;
@@ -90,88 +95,63 @@ public class Task {
         this.startTime = startTime;
     }
 
-    public int getDuration() {
+    public Duration getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(Duration duration) {
         this.duration = duration;
     }
 
     public LocalDateTime getEndTime() {
-        if (startTime != null && duration != 0) {
-            return startTime.plusMinutes(duration);
+        if (startTime != null && duration != null) {
+            return startTime.plusMinutes(duration.toMinutes());
         }
         return null;
     }
 
-//    @Override
-//    public String toString() {
-//        return "Task{" +
-//                "id=" + id +
-//                ", name='" + name + '\'' +
-//                ", description='" + description + '\'' +
-//                ", status='" + status + '\'' +
-//                '}';
-//    }
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+
     @Override
     public String toString() {
+
+        String formattedStartTime = "null";
+        if (startTime != null) {
+            formattedStartTime = startTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        }
+
+        String formattedEndTime = "null";
+        if (getEndTime() != null) {
+            formattedEndTime = getEndTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        }
+
         return "Task{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status + '\'' +
                 ", type=" + type + '\'' +
-                ", startTime=" + duration + '\'' +
-                ", duration=" + startTime + '\'' +
-                ", endTime" + endTime +
+                ", startTime=" + formattedStartTime + '\'' +
+                ", duration=" + duration + '\'' +
+                ", endTime=" + formattedEndTime +
                 '}';
+
     }
 
 
     @Override
-    public boolean equals(Object task) {
-
-        if (task instanceof Task) {
-            Task taskToCompare = (Task) task;
-
-            if (!this.getId().equals(taskToCompare.getId())) {
-                return false;
-            }
-
-            if (!this.getName().equals(taskToCompare.getName())) {
-                return false;
-            }
-
-            if (!this.getDescription().equals(taskToCompare.getDescription())) {
-                return false;
-            }
-
-            if (!this.getType().equals(taskToCompare.getType())) {
-                return false;
-            }
-
-            if (!this.getStatus().equals(taskToCompare.getStatus())) {
-                return false;
-            }
-
-//            if (!this.getStartTime().equals(taskToCompare.getStartTime())) {
-//                return false;
-//            }
-//
-//            if (!Objects.equals(this.getDuration(), taskToCompare.getDuration())) {
-//                return false;
-//            }
-//
-//            if (!this.getEndTime().equals(taskToCompare.getEndTime())) {
-//                return false;
-//            }
-
-
-            return true;
-        } else {
-            return false;
-        }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return Objects.equals(id, task.id) && Objects.equals(name, task.name) && Objects.equals(description, task.description) && status == task.status && type == task.type && Objects.equals(startTime, task.startTime) && Objects.equals(duration, task.duration) && Objects.equals(endTime, task.endTime);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, status, type, startTime, duration, endTime);
+    }
 }

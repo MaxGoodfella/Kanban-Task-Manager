@@ -1,13 +1,10 @@
 package finaltask.manager;
 
-import finaltask.tasks.Epic;
-import finaltask.tasks.Subtask;
-import finaltask.tasks.Task;
-import finaltask.tasks.TaskStatus;
+import finaltask.tasks.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager{
 
@@ -23,6 +20,18 @@ public class InMemoryTaskManager implements TaskManager{
 
     protected final HistoryManager historyManager;
 
+    // protected final TreeSet<Task> prioritizedTasks = new TreeSet<>(new DateTimeTaskSorter());
+
+    protected final TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.nullsLast((o1, o2) -> {
+        if (o1.getStartTime() != null && o2.getStartTime() != null) {
+            return o1.getStartTime().compareTo(o2.getStartTime());
+        } else if (o1 == o2) {
+            return 0;
+        } else {
+            return 1;
+        }
+    }));
+
     public InMemoryTaskManager(HistoryManager historyManager) {
         this.historyManager = historyManager;
     }
@@ -32,6 +41,7 @@ public class InMemoryTaskManager implements TaskManager{
         int id = generateID();
         task.setId(id);
         taskStorage.put(id, task);
+
         return task;
     }
 
@@ -172,6 +182,82 @@ public class InMemoryTaskManager implements TaskManager{
     }
 
     @Override
+    public void calculateEpicStartTime(int epicId) {
+        List<LocalDateTime> test = new ArrayList<>();
+        if (epicStorage.values().isEmpty()) {
+            return;
+        }
+        for (Epic epic : epicStorage.values()) {
+            if (Objects.equals(epic.getId(), epicId)) {
+                List<Subtask> epicSubtasks = getEpicSubtasksByEpicID(epic.getId());
+                if (epicSubtasks.isEmpty()) {
+                    return;
+                }
+                for (Subtask subtask : epicSubtasks) {
+                    if (subtask.getStartTime() != null) {
+                        test.add(subtask.getStartTime());
+                        LocalDateTime min = Collections.min(test);
+                        epic.setStartTime(min);
+                        calculateEpicDuration(epic.getId());
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void calculateEpicDuration(int epicId) {
+        Duration duration = Duration.ZERO;
+        if (epicStorage.values().isEmpty()) {
+            return;
+        }
+        for (Epic epic : epicStorage.values()) {
+            if (Objects.equals(epic.getId(), epicId)) {
+                List<Subtask> epicSubtasks = getEpicSubtasksByEpicID(epic.getId());
+                if (epicSubtasks.isEmpty()) {
+                    return;
+                }
+                for (Subtask subtask : epicSubtasks) {
+                    if (subtask.getDuration() == null) {
+                        epic.setDuration(duration);
+                        return;
+                    }
+                    duration = duration.plus(subtask.getDuration());
+                    epic.setDuration(duration);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void calculateEpicEndTime(int epicId) {
+        List<LocalDateTime> test = new ArrayList<>();
+        if (epicStorage.values().isEmpty()) {
+            return;
+        }
+        for (Epic epic : epicStorage.values()) {
+            if (Objects.equals(epic.getId(), epicId)) {
+                List<Subtask> epicSubtasks = getEpicSubtasksByEpicID(epic.getId());
+                if (epicSubtasks.isEmpty()) {
+                    if (epic.getStartTime() != null && epic.getDuration() != null) {
+                        LocalDateTime endTime = epic.getStartTime().plus(epic.getDuration());
+                        epic.setEndTime(endTime);
+                    }
+                    return;
+                }
+                for (Subtask subtask : epicSubtasks) {
+                    if (subtask.getEndTime() != null) {
+                        test.add(subtask.getEndTime());
+                        LocalDateTime max = Collections.max(test);
+                        epic.setEndTime(max);
+                    }
+                }
+            }
+        }
+    }
+
+
+    @Override
     public Subtask createSubtask(Subtask subtask) {
         int id = generateID();
         subtask.setId(id);
@@ -182,6 +268,7 @@ public class InMemoryTaskManager implements TaskManager{
             epic.addSubtaskID(id);
             updateEpicStatus(epic.getId());
         }
+
         return subtask;
     }
 
@@ -195,6 +282,17 @@ public class InMemoryTaskManager implements TaskManager{
     @Override
     public ArrayList<Subtask> getAllSubtasks() {
         return new ArrayList<>(subtaskStorage.values());
+    }
+
+    @Override
+    public List<Subtask> getEpicSubtasksByEpicID(int epicID) {
+        List<Subtask> epicsSubtasks = new ArrayList<>();
+        for (Subtask subtask : subtaskStorage.values()) {
+            if (Objects.equals(subtask.getEpicID(), epicID)) {
+                epicsSubtasks.add(subtask);
+            }
+        }
+        return epicsSubtasks;
     }
 
     @Override
@@ -242,12 +340,79 @@ public class InMemoryTaskManager implements TaskManager{
     }
 
     @Override
-    public void updateAllEpicsStatus() { //
+    public void updateAllEpicsStatus() {
         for (Epic epic : epicStorage.values()) {
             updateEpicStatus(epic.getId());
         }
     }
 
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        prioritizedTasks.addAll(taskStorage.values());
+        prioritizedTasks.addAll(epicStorage.values());
+        prioritizedTasks.addAll(subtaskStorage.values());
+
+        return new ArrayList<>(prioritizedTasks);
+    }
+
+
+    @Override
+    public boolean isIntersection(Task task) {
+        if (task == null || task.getStartTime() == null || prioritizedTasks.isEmpty()) {
+            return false;
+        }
+
+        for (Task tasksPrioritized : getPrioritizedTasks()) {
+            if (Objects.equals(tasksPrioritized.getId(), task.getId())) {
+                continue;
+            }
+            if (tasksPrioritized.getStartTime() == null) {
+                continue;
+            }
+            if (task.getEndTime().isBefore(tasksPrioritized.getStartTime()) || task.getStartTime().isAfter(tasksPrioritized.getEndTime())) {
+                return false;
+            }
+        }
+        return true;
+    } // рабочий метод,
+
+//    @Override
+//    public boolean isIntersection(Task task) {
+//        if (task == null || task.getStartTime() == null || prioritizedTasks.isEmpty()) {
+//            return false;
+//        }
+//
+//        for (Task tasksPrioritized : getPrioritizedTasks()) {
+//            if (Objects.equals(tasksPrioritized.getId(), task.getId())) {
+//                continue;
+//            }
+//
+//            if (task.getType() == TaskType.TASK && tasksPrioritized.getType() == TaskType.TASK) {
+//                if (task.getEndTime().isBefore(tasksPrioritized.getStartTime()) || task.getStartTime().isAfter(tasksPrioritized.getEndTime())) {
+//                    return false;
+//                }
+//            } else if (task.getType() == TaskType.SUBTASK && tasksPrioritized.getType() == TaskType.TASK) {
+//                if (task.getEndTime().isBefore(tasksPrioritized.getStartTime()) || task.getStartTime().isAfter(tasksPrioritized.getEndTime())) {
+//                    return false;
+//                }
+//            } else if (task.getType() == TaskType.TASK && tasksPrioritized.getType() == TaskType.SUBTASK) {
+//                if (task.getEndTime().isBefore(tasksPrioritized.getStartTime()) || task.getStartTime().isAfter(tasksPrioritized.getEndTime())) {
+//                    return false;
+//                }
+//            } else if (task.getType() == TaskType.SUBTASK && tasksPrioritized.getType() == TaskType.SUBTASK) {
+//                if (task.getEndTime().isBefore(tasksPrioritized.getStartTime()) || task.getStartTime().isAfter(tasksPrioritized.getEndTime())) {
+//                    return false;
+//                }
+//            }
+//        }
+//        return true;
+//    } // вроде специально под разные типы задач написал, но не работает
+
+
+
+
+
+    @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }

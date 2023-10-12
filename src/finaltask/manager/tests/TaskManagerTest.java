@@ -11,6 +11,8 @@ import finaltask.tasks.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,7 +35,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.removeAllTasks();
         taskManager.removeAllEpics();
         taskManager.removeAllSubtasks();
-
+        // taskManager.getPrioritizedTasks().clear();
     }
 
 
@@ -61,10 +63,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     void testGetTaskById() {
         Task newTask = new Task("Test Task", "Test Task Description");
         taskManager.createTask(newTask);
-        // Task task = taskManager.getTaskByID(createdTask.getId());
-        //assertEquals(newTask, taskManager.getTaskByID(createdTask.getId()));
         assertEquals(newTask, taskManager.getTaskByID(newTask.getId()));
-
         // System.out.println(taskManager.getHistory().size());
         // +1
     }
@@ -148,6 +147,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         List<Epic> allEpics = taskManager.getAllEpics();
         assertEquals(2, allEpics.size(), "Количество эпиков после создания не совпадает");
+
     }
 
 
@@ -171,7 +171,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void testGetAllEpics() {
         Epic newEpic = new Epic("Test Epic", "Test Epic Description");
-        Epic createdEpic = taskManager.createEpic(newEpic);
+        taskManager.createEpic(newEpic);
 
         List<Epic> epics = taskManager.getAllEpics();
         assertNotNull(epics, "История пустая");
@@ -279,39 +279,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void testActualizeEpic() {
-
-        HistoryManager historyManager = new InMemoryHistoryManager();
-        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager(historyManager);
-
-        Epic newEpic = new Epic("Test Epic", "Test Epic Description");
-        taskManager.createEpic(newEpic);
-
-        Subtask subtask1 = new Subtask("Subtask 1", "Subtask Description 1", TaskStatus.NEW, newEpic.getId());
-        taskManager.createSubtask(subtask1);
-        Subtask subtask2 = new Subtask("Subtask 2", "Subtask Description 2", TaskStatus.NEW, newEpic.getId());
-        taskManager.createSubtask(subtask2);
-
-        taskManager.actualizeEpic(newEpic.getId(), inMemoryTaskManager);
-        assertEquals(TaskStatus.NEW, newEpic.getStatus(), "Статус эпика не был обновлен на NEW");
-
-
-        subtask1.setStatus(TaskStatus.DONE);
-        subtask2.setStatus(TaskStatus.DONE);
-        taskManager.updateSubtask(subtask1);
-        taskManager.updateSubtask(subtask2);
-        taskManager.actualizeEpic(newEpic.getId(), inMemoryTaskManager);
-        assertEquals(TaskStatus.DONE, newEpic.getStatus(), "Статус эпика не был обновлен на DONE");
-
-
-        subtask2.setStatus(TaskStatus.IN_PROGRESS);
-        taskManager.updateSubtask(subtask2);
-        taskManager.actualizeEpic(newEpic.getId(), inMemoryTaskManager);
-        assertEquals(TaskStatus.IN_PROGRESS, newEpic.getStatus(), "Статус эпика не был обновлен на IN_PROGRESS");
-
-    }
-
-    @Test
     void testUpdateAllEpicsStatus() {
 
         Epic newEpic1 = new Epic("Test New Epic1", "Test New Epic1 Description");
@@ -350,6 +317,74 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(TaskStatus.IN_PROGRESS, createdEpic1.getStatus(), "Статус эпика не был обновлен на IN_PROGRESS");
         assertEquals(TaskStatus.DONE, createdEpic2.getStatus(), "Статус эпика не был обновлен на DONE");
         assertEquals(TaskStatus.NEW, createdEpic3.getStatus(), "Статус эпика не был обновлен на NEW");
+
+    }
+
+    @Test
+    void testActualizeEpic() {
+
+        HistoryManager historyManager = new InMemoryHistoryManager();
+        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager(historyManager);
+
+        Epic newEpic = new Epic("Test Epic", "Test Epic Description");
+        taskManager.createEpic(newEpic);
+
+        Subtask subtask1 = new Subtask("Subtask 1", "Subtask Description 1", TaskStatus.NEW, newEpic.getId());
+        taskManager.createSubtask(subtask1);
+        Subtask subtask2 = new Subtask("Subtask 2", "Subtask Description 2", TaskStatus.NEW, newEpic.getId());
+        taskManager.createSubtask(subtask2);
+
+        taskManager.actualizeEpic(newEpic.getId(), inMemoryTaskManager);
+        assertEquals(TaskStatus.NEW, newEpic.getStatus(), "Статус эпика не был обновлен на NEW");
+
+
+        subtask1.setStatus(TaskStatus.DONE);
+        subtask2.setStatus(TaskStatus.DONE);
+        taskManager.updateSubtask(subtask1);
+        taskManager.updateSubtask(subtask2);
+        taskManager.actualizeEpic(newEpic.getId(), inMemoryTaskManager);
+        assertEquals(TaskStatus.DONE, newEpic.getStatus(), "Статус эпика не был обновлен на DONE");
+
+
+        subtask2.setStatus(TaskStatus.IN_PROGRESS);
+        taskManager.updateSubtask(subtask2);
+        taskManager.actualizeEpic(newEpic.getId(), inMemoryTaskManager);
+        assertEquals(TaskStatus.IN_PROGRESS, newEpic.getStatus(), "Статус эпика не был обновлен на IN_PROGRESS");
+
+    }
+
+    @Test
+    public void testCalculateEpicStartTimeDurationAndEndTimeWhenSubtasksGiven() {
+
+        Epic epic1 = new Epic("Эпик №1", "Описание эпика №1", TaskStatus.NEW);
+        epic1 = taskManager.createEpic(epic1);
+
+
+        LocalDateTime subtask1_1StartTime = LocalDateTime.of(2023, 11, 10, 15, 0);
+        Duration subtask1_1Duration = Duration.ofMinutes(15);
+        Subtask subtask1_1 = new Subtask("Подзадача №1.1", "Описание подзадачи №1.1", TaskStatus.NEW, epic1.getId(), subtask1_1StartTime, subtask1_1Duration);
+
+        LocalDateTime subtask1_2StartTime = LocalDateTime.of(2023, 11, 10, 15, 30);
+        Duration subtask1_2Duration = Duration.ofMinutes(10);
+        Subtask subtask1_2 = new Subtask("Подзадача №1.2", "Описание подзадачи №1.2", TaskStatus.NEW, epic1.getId(), subtask1_2StartTime, subtask1_2Duration);
+
+        LocalDateTime subtask1_3StartTime = LocalDateTime.of(2023, 11, 10, 16, 0);
+        Duration subtask1_3Duration = Duration.ofMinutes(25);
+        Subtask subtask1_3 = new Subtask("Подзадача №1.3", "Описание подзадачи №1.3", TaskStatus.NEW, epic1.getId(), subtask1_3StartTime, subtask1_3Duration);
+
+        taskManager.createSubtask(subtask1_1);
+        taskManager.createSubtask(subtask1_2);
+        taskManager.createSubtask(subtask1_3);
+
+
+        taskManager.calculateEpicStartTime(epic1.getId());
+        taskManager.calculateEpicDuration(epic1.getId());
+        taskManager.calculateEpicEndTime(epic1.getId());
+
+
+        assertEquals(subtask1_1StartTime, epic1.getStartTime(), "Время начала эпика не совпадает с временем начала первой подзадачи");
+        assertEquals(Duration.ofMinutes(50), epic1.getDuration(), "Продолжительность эпика не совпадает с общей продолжительностью подзадач");
+        assertEquals(subtask1_3StartTime.plus(subtask1_3Duration), epic1.getEndTime(), "Время завершения эпика не совпадает с временем завершения последней подзадачи");
 
     }
 
@@ -441,7 +476,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
 
-
     @Test
     void testGetHistory() {
 //
@@ -507,4 +541,151 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         // Подскажи, пожалуйста, почему это происходит? И как мне это исправить?
 
     }
+
+
+    @Test
+    public void testGetPrioritizedTasks() {
+
+        // Артем, нужна помощь с вот этим методом
+        // отдельное работает, вместе - нет
+
+
+        taskManager.getPrioritizedTasks().clear();
+
+        LocalDateTime task1StartTime = LocalDateTime.of(2023, 11, 10, 11, 30);
+        Duration task1Duration = Duration.ofMinutes(20);
+        Task task1 = new Task("Задача №1", "Описание задачи №1", TaskStatus.NEW, task1StartTime, task1Duration);
+        task1 = taskManager.createTask(task1);
+
+
+        LocalDateTime epic1StartTime = LocalDateTime.of(2023, 11, 10, 13, 0);
+        Duration epic1Duration = Duration.ofMinutes(20);
+        Epic epic1 = new Epic("Эпик №1", "Описание эпика №1", TaskStatus.NEW, epic1StartTime, epic1Duration);
+        epic1 = taskManager.createEpic(epic1);
+
+
+        LocalDateTime subtask1_1StartTime = LocalDateTime.of(2023, 11, 10, 15, 0);
+        Duration subtask1_1Duration = Duration.ofMinutes(15);
+        Subtask subtask1_1 = new Subtask("Подзадача №1.1", "Описание подзадачи №1.1", TaskStatus.NEW, epic1.getId(), subtask1_1StartTime, subtask1_1Duration);
+        subtask1_1 = taskManager.createSubtask(subtask1_1);
+
+
+        List<Task> prioritizedTasks = taskManager.getPrioritizedTasks();
+
+        // System.out.println(prioritizedTasks);
+
+        assertTrue(prioritizedTasks.contains(task1), "Данная задача отсутствует в списке");
+        assertTrue(prioritizedTasks.contains(epic1), "Данный эпик отсутствует в списке");
+        assertTrue(prioritizedTasks.contains(subtask1_1), "Данная подзадача отсутствует в списке");
+
+        assertEquals(task1, prioritizedTasks.get(0), "Данный элемент (задача) стоит не по приоритету начала выполнения");
+        assertEquals(epic1, prioritizedTasks.get(1), "Данный элемент (эпик) стоит не по приоритету начала выполнения");
+        assertEquals(subtask1_1, prioritizedTasks.get(2), "Данный элемент (подзадача) стоит не по приоритету начала выполнения");
+
+    }
+
+
+    // for the one above
+
+    // if started separately:
+    // [Task{id=1, name='Задача №1', description='Описание задачи №1', status=NEW', type=TASK', startTime=2023-11-10 11:30', duration=PT20M', endTime=2023-11-10 11:50},
+    // Task{id=2, name='Эпик №1', description='Описание эпика №1', status=NEW', type=EPIC', startTime=2023-11-10 13:00', duration=PT20M', endTime=null},
+    // Task{id=3, name='Подзадача №1.1', description='Описание подзадачи №1.1', status=NEW', type=SUBTASK', startTime=2023-11-10 15:00', duration=PT15M', endTime=2023-11-10 15:15}]
+
+    // if started collectively:
+    // [Task{id=5, name='Test Task2', description='Test Task2 Description', status=NEW', type=TASK', startTime=2023-11-10 10:45', duration=PT20M', endTime=2023-11-10 11:05},
+    // Task{id=21, name='Задача №1', description='Описание задачи №1', status=NEW', type=TASK', startTime=2023-11-10 11:30', duration=PT20M', endTime=2023-11-10 11:50},
+    // Task{id=4, name='Test Task1', description='Test Task1 Description', status=NEW', type=TASK', startTime=2023-11-10 12:00', duration=PT30M', endTime=2023-11-10 12:30},
+    // Task{id=22, name='Эпик №1', description='Описание эпика №1', status=NEW', type=EPIC', startTime=2023-11-10 13:00', duration=PT20M', endTime=null},
+    // Task{id=23, name='Подзадача №1.1', description='Описание подзадачи №1.1', status=NEW', type=SUBTASK', startTime=2023-11-10 15:00', duration=PT15M', endTime=2023-11-10 15:15}]
+
+
+
+
+    @Test
+    public void testIsIntersectionWhenTasksIntersect() {
+        LocalDateTime task1StartTime = LocalDateTime.of(2023, 11, 10, 11, 10);
+        Duration task1Duration = Duration.ofMinutes(20);
+        Task task1 = new Task("Задача №1", "Описание задачи №1", TaskStatus.NEW, task1StartTime, task1Duration);
+        task1 = taskManager.createTask(task1);
+
+        LocalDateTime task2StartTime = LocalDateTime.of(2023, 11, 10, 11, 25);
+        Duration task2Duration = Duration.ofMinutes(20);
+        Task task2 = new Task("Задача №2", "Описание задачи №2", TaskStatus.NEW, task2StartTime, task2Duration);
+        task2 = taskManager.createTask(task2);
+
+        taskManager.getPrioritizedTasks();
+
+        boolean result = taskManager.isIntersection(task1);
+        assertTrue(result, "Метод должен возвращать true для пересекающихся задач");
+
+    }
+
+
+    @Test
+    public void testIsIntersectionWhenTasksDontIntersect() {
+        LocalDateTime task1StartTime = LocalDateTime.of(2023, 11, 10, 12, 10);
+        Duration task1Duration = Duration.ofMinutes(20);
+        Task task1 = new Task("Задача №1", "Описание задачи №1", TaskStatus.NEW, task1StartTime, task1Duration);
+        task1 = taskManager.createTask(task1);
+
+        LocalDateTime task2StartTime = LocalDateTime.of(2023, 11, 10, 11, 25);
+        Duration task2Duration = Duration.ofMinutes(20);
+        Task task2 = new Task("Задача №2", "Описание задачи №2", TaskStatus.NEW, task2StartTime, task2Duration);
+        task2 = taskManager.createTask(task2);
+
+        taskManager.getPrioritizedTasks();
+
+        boolean result = taskManager.isIntersection(task1);
+        assertFalse(result, "Метод должен возвращать false для пересекающихся задач");
+    }
+
+    @Test
+    public void testIsIntersectionWhenPrioritizedTasksListIsEmpty() {
+        Task task = new Task("Задача №1", "Описание задачи №1", TaskStatus.NEW);
+        taskManager.createTask(task);
+
+        boolean result = taskManager.isIntersection(task);
+        assertFalse(result, "Метод должен возвращать false, когда список задач по приоритету пуст");
+    }
+
+    @Test
+    public void testIsIntersectionWithNullTask() {
+        boolean result = taskManager.isIntersection(null);
+        assertFalse(result, "Метод должен возвращать false, когда task = null");
+    }
+
+    @Test
+    public void testIsIntersectionWithInvalidTask() {
+        Task task = new Task("Задача №1", "Описание задачи №1", TaskStatus.NEW, LocalDateTime.of(2023, 11, 10, 12, 0), Duration.ofMinutes(-30));
+        taskManager.createTask(task);
+
+        boolean result = taskManager.isIntersection(task);
+        assertFalse(result, "Метод должен возвращать false, когда указаны неверные параметры времени");
+    }
+
+    // Артём, с тестовым методом ниже нужна помощь, работает, если отдельно запускать, причём с обеими реализациями
+    // isIntersection() в InMemoryTaskManager, но вместе со всеми если запускать, не работает. Помоги, пожалуйста.
+
+
+    @Test
+    public void testIsIntersectionWhenSubtasksIntersect() {
+
+        LocalDateTime subtask1_1StartTime = LocalDateTime.of(2023, 11, 10, 15, 0);
+        Duration subtask1_1Duration = Duration.ofMinutes(15);
+        Subtask subtask1_1 = new Subtask("Подзадача №1.1", "Описание подзадачи №1.1", TaskStatus.NEW, 0, subtask1_1StartTime, subtask1_1Duration);
+
+        LocalDateTime subtask1_2StartTime = LocalDateTime.of(2023, 11, 10, 15, 5);
+        Duration subtask1_2Duration = Duration.ofMinutes(10);
+        Subtask subtask1_2 = new Subtask("Подзадача №1.2", "Описание подзадачи №1.2", TaskStatus.NEW, 0, subtask1_2StartTime, subtask1_2Duration);
+
+        taskManager.createSubtask(subtask1_1);
+        taskManager.createSubtask(subtask1_2);
+
+        taskManager.getPrioritizedTasks();
+
+        boolean result = taskManager.isIntersection(subtask1_1);
+        assertTrue(result, "Метод должен возвращать true для пересекающихся подзадач");
+    }
+
 }

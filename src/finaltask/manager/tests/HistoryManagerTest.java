@@ -52,8 +52,6 @@ class HistoryManagerTest {
 
     @Test
     void testGetHistoryWhenOneTaskAdded() {
-//        task = new Task("Task 1", "Description 1");
-//        task = taskManager.createTask(task);
         historyManager.addTask(task);
         List<Task> history = historyManager.getHistory();
         assertNotNull(history, "История не пустая.");
@@ -62,11 +60,6 @@ class HistoryManagerTest {
 
     @Test
     void testGetHistoryWithoutDuplicates() {
-//        task = new Task("Task 1", "Description 1");
-//        task = taskManager.createTask(task);
-//
-//        epic = new Epic("Epic 1", "Description 1");
-//        epic = taskManager.createEpic(epic);
 
         historyManager.addTask(task);
         historyManager.addTask(task);
@@ -78,6 +71,7 @@ class HistoryManagerTest {
         List<Task> history = historyManager.getHistory();
         assertNotNull(history, "История не пустая");
         assertEquals(2, history.size(), "История не соответствует размеру");
+
     }
 
     @Test

@@ -1,7 +1,5 @@
 package finaltask.manager;
 
-import finaltask.tasks.Epic;
-import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
 
 import java.util.*;

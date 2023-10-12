@@ -8,8 +8,6 @@ import finaltask.tasks.TaskStatus;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,22 +18,54 @@ public class Main {
         HistoryManager historyManager = Managers.getHistoryDefault();
 
 
-        Task task1 = new Task("Задача №1", "Описание задачи №1");
-        Task task2 = new Task("Задача №2", "Описание задачи №2");
+        LocalDateTime task1StartTime = LocalDateTime.of(2023, 11, 10, 11, 30);
+        Duration task1Duration = Duration.ofMinutes(20);
+        Task task1 = new Task("Задача №1", "Описание задачи №1", TaskStatus.NEW, task1StartTime, task1Duration);
+
+        LocalDateTime task2StartTime = LocalDateTime.of(2023, 11, 10, 12, 0);
+        Duration task2Duration = Duration.ofMinutes(30);
+        Task task2 = new Task("Задача №2", "Описание задачи №2", TaskStatus.IN_PROGRESS, task2StartTime, task2Duration);
+
         task1 = taskManager.createTask(task1);
         task2 = taskManager.createTask(task2);
 
-        Epic epic1 = new Epic("Эпик №1", "Описание эпика №1", TaskStatus.NEW);
-        Epic epic2 = new Epic("Эпик №2", "Описание эпика №2", TaskStatus.NEW);
-        epic1 = taskManager.createEpic(epic1);
-        epic2 = taskManager.createEpic(epic2);
 
-        Subtask subtask1_1 = new Subtask("Подзадача №1.1", "Описание подзадачи №1.1", TaskStatus.NEW, epic1.getId());
-        Subtask subtask1_2 = new Subtask("Подзадача №1.2", "Описание подзадачи №1.2", TaskStatus.NEW, epic1.getId());
-        Subtask subtask1_3 = new Subtask("Подзадача №1.3", "Описание подзадачи №1.3", TaskStatus.NEW, epic1.getId());
+        Epic epic1 = new Epic("Эпик №1", "Описание эпика №1", TaskStatus.NEW);
+        epic1 = taskManager.createEpic(epic1);
+
+
+        LocalDateTime subtask1_1StartTime = LocalDateTime.of(2023, 11, 10, 15, 0);
+        Duration subtask1_1Duration = Duration.ofMinutes(15);
+        Subtask subtask1_1 = new Subtask("Подзадача №1.1", "Описание подзадачи №1.1", TaskStatus.NEW, epic1.getId(), subtask1_1StartTime, subtask1_1Duration);
+
+        LocalDateTime subtask1_2StartTime = LocalDateTime.of(2023, 11, 10, 15, 30);
+        Duration subtask1_2Duration = Duration.ofMinutes(10);
+        Subtask subtask1_2 = new Subtask("Подзадача №1.2", "Описание подзадачи №1.2", TaskStatus.NEW, epic1.getId(), subtask1_2StartTime, subtask1_2Duration);
+
+        LocalDateTime subtask1_3StartTime = LocalDateTime.of(2023, 11, 10, 16, 0);
+        Duration subtask1_3Duration = Duration.ofMinutes(25);
+        Subtask subtask1_3 = new Subtask("Подзадача №1.3", "Описание подзадачи №1.3", TaskStatus.NEW, epic1.getId(), subtask1_3StartTime, subtask1_3Duration);
+
         subtask1_1 = taskManager.createSubtask(subtask1_1);
         subtask1_2 = taskManager.createSubtask(subtask1_2);
         subtask1_3 = taskManager.createSubtask(subtask1_3);
+
+        taskManager.calculateEpicStartTime(epic1.getId());
+        taskManager.calculateEpicDuration(epic1.getId());
+        taskManager.calculateEpicEndTime(epic1.getId());
+
+
+
+        LocalDateTime epic2StartTime = LocalDateTime.of(2023, 11, 10, 20, 0);
+        Duration epic2Duration = Duration.ofMinutes(20);
+
+        Epic epic2 = new Epic("Эпик №2", "Описание эпика №2", TaskStatus.NEW, epic2StartTime, epic2Duration);
+        epic2 = taskManager.createEpic(epic2);
+
+        taskManager.calculateEpicStartTime(epic2.getId());
+        taskManager.calculateEpicDuration(epic2.getId());
+        taskManager.calculateEpicEndTime(epic2.getId());
+
 
 
         epic1.addSubtaskID(subtask1_1.getId());
@@ -134,6 +164,7 @@ public class Main {
         historyManager.addTask(taskManager.getEpicByID(epic2.getId()));
         historyManager.addTask(taskManager.getSubtaskByID(subtask1_2.getId()));
 
+
         System.out.println("История просмотров до удаления:");
         List<Task> historyBefore = historyManager.getHistory();
         for (Task task : historyBefore) {
@@ -158,18 +189,9 @@ public class Main {
             System.out.println(task);
         }
 
-//
-//        LocalDateTime startTime = LocalDateTime.now();
-//
-//        long duration = 90;
-//
-//        LocalDateTime endTime = startTime.plus(90, ChronoUnit.MINUTES);
-//
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//        System.out.println(startTime.format(formatter));
-//
-//
-//        // последующий метод getEndTime() нужно будет положить в класс задач
+        System.out.println("Сортировка списка задач по времени начала:");
+        System.out.println(taskManager.getPrioritizedTasks());
+
 
     }
 }

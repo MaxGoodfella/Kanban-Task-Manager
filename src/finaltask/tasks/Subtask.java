@@ -1,6 +1,7 @@
 package finaltask.tasks;
 
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -8,6 +9,9 @@ public class Subtask extends Task {
 
     private int epicID;
 
+    public Subtask () {
+
+    }
 
     public Subtask(String name, String description, TaskStatus status, int epicID) {
         super(name, description, status);
@@ -22,57 +26,43 @@ public class Subtask extends Task {
         this.type = TaskType.SUBTASK;
     }
 
-    public Subtask(String name, String description, LocalDateTime startTime, Integer duration, int epicID) {
+    public Subtask(String name, String description, int epicID, LocalDateTime startTime, Duration duration) {
         super(name, description, TaskStatus.NEW);
         this.epicID = epicID;
         this.type = TaskType.SUBTASK;
         this.startTime = startTime;
         this.duration = duration;
+        this.endTime = getEndTime();
     }
 
-
+    public Subtask(String name, String description, TaskStatus status, int epicID, LocalDateTime startTime, Duration duration) {
+        super(name, description, status);
+        this.epicID = epicID;
+        this.type = TaskType.SUBTASK;
+        this.startTime = startTime;
+        this.duration = duration;
+        this.endTime = getEndTime();
+    }
 
     public int getEpicID() {
         return epicID;
     }
 
-
-    public boolean equals(Object subtask) {
-
-        if (subtask instanceof Subtask) {
-            Subtask subtaskToCompare = (Subtask) subtask;
-
-            if (!this.getId().equals(subtaskToCompare.getId())) {
-                return false;
-            }
-
-            if (!this.getName().equals(subtaskToCompare.getName())) {
-                return false;
-            }
-
-            if (!this.getDescription().equals(subtaskToCompare.getDescription())) {
-                return false;
-            }
-
-            if (!this.getType().equals(subtaskToCompare.getType())) {
-                return false;
-            }
-
-            if (!this.getStatus().equals(subtaskToCompare.getStatus())) {
-                return false;
-            }
-
-            if (!Objects.equals(startTime, subtaskToCompare.startTime)) {
-                return false;
-            }
-
-            if (duration != subtaskToCompare.duration) {
-                return false;
-            }
-            return true;
-        } else {
-            return false;
-        }
+    public void setEpicID(int epicID) {
+        this.epicID = epicID;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Subtask subtask = (Subtask) o;
+        return epicID == subtask.epicID;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), epicID);
+    }
 }
