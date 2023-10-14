@@ -24,13 +24,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class FileSaveAndLoadTaskTest {
 
-    File file = new File("/Users/MaximGuseynov/dev3/sprint7/java-kanban/src/resources/sprint7/test.txt");
+    // File file = new File("/Users/MaximGuseynov/dev3/sprint7/java-kanban/src/resources/sprint7/test.txt");
+
+    File file = new File("java-kanban/src/resources/sprint7/test.txt");
 
     InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
     FileBackedTaskManager taskManager = new FileBackedTaskManager(file, historyManager);
 
     @BeforeEach
-    void setUpSecond() {
+    void setUp() {
 
         assertTrue(file.exists(), "Файл не существует");
 
@@ -140,10 +142,24 @@ public class FileSaveAndLoadTaskTest {
 
     @Test
     public void testSaveThrowsException() {
-        File file = new File("/Users/MaximGuseynov/dev3/sprint7/java-kanban/src/resources/sprint7/test1.txt");
+        // 1 способ
+//        File file = new File("/invalid/file/path");
+//        FileBackedTaskManager taskManager = new FileBackedTaskManager(file, historyManager);
+//        assertThrows(ManagerSaveException.class, taskManager::save);
+
+        // 2 способ с выводом информации об ошибке
+        File file = new File("/invalid/file/path");
         FileBackedTaskManager taskManager = new FileBackedTaskManager(file, historyManager);
-        taskManager.save();
+        try {
+            taskManager.save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
+
+        // Я хотел здесь показать, что метод save() выкинет ошибку, если указать invalid file path
+
     }
+
 
     private List<String> readLinesFromFile(File file) {
         List<String> lines = new ArrayList<>();

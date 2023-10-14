@@ -15,6 +15,7 @@ public class FileBackedTaskManagerChecker {
     public static void main(String[] args) {
 
         File file = new File("/Users/MaximGuseynov/dev3/sprint7/java-kanban/src/resources/sprint7/test.txt");
+        // вот здесь тоже пытался на относительный поменять, но он не пропускает :(
 
 
         HistoryManager historyManager = new InMemoryHistoryManager();

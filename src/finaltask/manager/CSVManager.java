@@ -12,6 +12,7 @@ public class CSVManager {
 
     private static final String DELIMITER = ",";
 
+
     public String taskToString(Task task) {
 
         String result = task.getId() + DELIMITER +
@@ -32,54 +33,6 @@ public class CSVManager {
     }
 
 
-    /*
-    public Task taskFromString(String taskStr, FileBackedTaskManager manager) {
-        String[] parts = taskStr.split(DELIMITER);
-        int id = Integer.parseInt(parts[0]);
-        TaskType type = TaskType.valueOf(parts[1]);
-        String name = parts[2];
-        TaskStatus status = TaskStatus.valueOf(parts[3]);
-        String description = parts[4];
-        LocalDateTime startTime = LocalDateTime.parse(parts[6]);
-        Duration duration = Duration.parse(parts[7]);
-        LocalDateTime endTime = LocalDateTime.parse(parts[8]);
-
-
-
-        switch (type) {
-            case TASK:
-                Task task = new Task(name, description, status);
-                task.setId(id);
-                task.setEndTime(endTime);
-                manager.taskStorage.put(id, task);
-                return task;
-            case EPIC:
-                Epic epic = new Epic(name, description, status);
-                epic.setId(id);
-                epic.setStartTime(startTime);
-                epic.setDuration(duration);
-                epic.setEndTime(endTime);
-                manager.epicStorage.put(id, epic);
-                return epic;
-            case SUBTASK:
-
-                    int epicID = Integer.parseInt(parts[5]);
-                    Subtask subtask = new Subtask(name, description, status, epicID);
-                    subtask.setId(id);
-                    subtask.setStartTime(startTime);
-                    subtask.setDuration(duration);
-                    subtask.setEndTime(endTime);
-                    subtask.setEpicID(epicID);
-                    manager.subtaskStorage.put(id, subtask);
-                    return subtask;
-
-            default:
-                throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
-        }
-    }
-
-     */
-
     public Task taskFromString(String taskStr, FileBackedTaskManager manager) {
         String[] parts = taskStr.split(DELIMITER);
 
@@ -99,9 +52,9 @@ public class CSVManager {
                     task.setDuration(Duration.parse(parts[7]));
                     task.setEndTime(LocalDateTime.parse(parts[8]));
                 } else {
-                    task.setStartTime(LocalDateTime.parse("")); // !
-                    task.setDuration(Duration.parse("")); // !
-                    task.setEndTime(LocalDateTime.parse("")); // !
+                    task.setStartTime(LocalDateTime.parse(""));
+                    task.setDuration(Duration.parse(""));
+                    task.setEndTime(LocalDateTime.parse(""));
                 }
                 manager.taskStorage.put(id, task);
                 return task;
@@ -117,9 +70,9 @@ public class CSVManager {
                     epic.setDuration(Duration.parse(parts[7]));
                     epic.setEndTime(LocalDateTime.parse(parts[8]));
                 }  else {
-                    epic.setStartTime(LocalDateTime.parse("")); // !
-                    epic.setDuration(Duration.parse("")); // !
-                    epic.setEndTime(LocalDateTime.parse("")); // !
+                    epic.setStartTime(LocalDateTime.parse(""));
+                    epic.setDuration(Duration.parse(""));
+                    epic.setEndTime(LocalDateTime.parse(""));
                 }
                 manager.epicStorage.put(id, epic);
                 return epic;
@@ -136,9 +89,9 @@ public class CSVManager {
                     subtask.setDuration(Duration.parse(parts[7]));
                     subtask.setEndTime(LocalDateTime.parse(parts[8]));
                 } else {
-                    subtask.setStartTime(LocalDateTime.parse("")); // !
-                    subtask.setDuration(Duration.parse("")); // !
-                    subtask.setEndTime(LocalDateTime.parse("")); // !
+                    subtask.setStartTime(LocalDateTime.parse(""));
+                    subtask.setDuration(Duration.parse(""));
+                    subtask.setEndTime(LocalDateTime.parse(""));
                 }
                 manager.subtaskStorage.put(id, subtask);
                 return subtask;

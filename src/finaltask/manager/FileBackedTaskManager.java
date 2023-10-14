@@ -8,7 +8,7 @@ import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private File file;
+    File file;
     public static CSVManager csvManager = new CSVManager();
 
     public FileBackedTaskManager(File file, HistoryManager historyManager) {

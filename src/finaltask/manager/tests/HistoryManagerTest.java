@@ -18,12 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class HistoryManagerTest {
 
     private HistoryManager historyManager;
-
     private TaskManager taskManager;
+
     private Task task;
-
     private Epic epic;
-
     private Subtask subtask;
 
 
@@ -93,9 +91,23 @@ class HistoryManagerTest {
         assertEquals(1, history.size(), "История не соответствует размеру");
     }
 
+    @Test
+    void testGetHistoryAndVerifyThatOrderIsCorrect() {
+        historyManager.addTask(task);
+        historyManager.addTask(epic);
+        historyManager.addTask(subtask);
+
+        List<Task> history = historyManager.getHistory();
+        assertNotNull(history, "История не пустая");
+        assertEquals(3, history.size(), "История не соответствует размеру");
+
+        assertEquals(task, history.get(0), "Первая задача в истории не соответствует ожиданию");
+        assertEquals(epic, history.get(1), "Вторая задача в истории не соответствует ожиданию");
+        assertEquals(subtask, history.get(2), "Третья задача в истории не соответствует ожиданию");
+    }
+
     @AfterEach
     void clean() {
-
         historyManager.remove(taskManager.removeTaskByID(task.getId()));
         historyManager.remove(taskManager.removeEpicByID(epic.getId()));
         historyManager.remove(taskManager.removeSubtaskByID(subtask.getId()));

@@ -1,12 +1,13 @@
 package finaltask.manager.tests;
 
 
+import finaltask.manager.InMemoryHistoryManager;
 import finaltask.manager.InMemoryTaskManager;
-import finaltask.manager.Managers;
 
 public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     @Override
     protected InMemoryTaskManager createTaskManager() {
-        return Managers.getDefault();
+        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+        return new InMemoryTaskManager(historyManager);
     }
 }
