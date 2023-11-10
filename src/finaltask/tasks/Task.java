@@ -14,6 +14,8 @@ public class Task {
     protected TaskType type;
     protected LocalDateTime startTime;
     protected Duration duration;
+
+
     protected LocalDateTime endTime;
 
     public Task() {

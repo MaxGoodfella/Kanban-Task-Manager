@@ -2,7 +2,7 @@ package finaltask.manager.tests;
 
 import finaltask.manager.FileBackedTaskManager;
 import finaltask.manager.InMemoryHistoryManager;
-import finaltask.manager.ManagerSaveException;
+import finaltask.manager.exceptions.ManagerSaveException;
 import finaltask.tasks.Epic;
 import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
@@ -20,7 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FileSaveAndLoadTaskTest {
 

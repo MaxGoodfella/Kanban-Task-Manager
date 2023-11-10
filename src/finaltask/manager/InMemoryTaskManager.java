@@ -1,6 +1,9 @@
 package finaltask.manager;
 
-import finaltask.tasks.*;
+import finaltask.tasks.Epic;
+import finaltask.tasks.Subtask;
+import finaltask.tasks.Task;
+import finaltask.tasks.TaskStatus;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -146,13 +149,15 @@ public class InMemoryTaskManager implements TaskManager{
             boolean anySubtaskInProgress = false;
 
             for (Integer subtaskID : epic.getAllSubtaskIDs()) {
-                Subtask subtask = subtaskStorage.get(subtaskID);
-                if (subtask != null) {
-                    TaskStatus subtaskStatus = subtask.getStatus();
-                    if (subtaskStatus != TaskStatus.DONE) {
-                        allSubtasksDone = false;
-                        if (subtaskStatus == TaskStatus.IN_PROGRESS) {
-                            anySubtaskInProgress = true;
+                if (subtaskID != 0) {
+                    Subtask subtask = subtaskStorage.get(subtaskID);
+                    if (subtask != null) {
+                        TaskStatus subtaskStatus = subtask.getStatus();
+                        if (subtaskStatus != TaskStatus.DONE) {
+                            allSubtasksDone = false;
+                            if (subtaskStatus == TaskStatus.IN_PROGRESS) {
+                                anySubtaskInProgress = true;
+                            }
                         }
                     }
                 }
@@ -257,17 +262,37 @@ public class InMemoryTaskManager implements TaskManager{
 
     @Override
     public Subtask createSubtask(Subtask subtask) {
+//        int id = generateID();
+//        subtask.setId(id);
+//        subtaskStorage.put(id, subtask);
+//
+//        Epic epic = epicStorage.get(subtask.getEpicID());
+//        if (epic != null) {
+//            epic.addSubtaskID(id);
+//            updateEpicStatus(epic.getId());
+//        }
+//
+//        return subtask;
+
         int id = generateID();
         subtask.setId(id);
         subtaskStorage.put(id, subtask);
 
-        Epic epic = epicStorage.get(subtask.getEpicID());
-        if (epic != null) {
-            epic.addSubtaskID(id);
-            updateEpicStatus(epic.getId());
+        Integer epicID = subtask.getEpicID();
+        if (epicID != null) {
+            Epic epic = epicStorage.get(epicID);
+            if (epic != null) {
+                epic.addSubtaskID(id);
+                updateEpicStatus(epicID);
+            } else {
+                System.err.println("Epic not found for subtask ID: " + epicID);
+            }
+        } else {
+            System.err.println("EpicID is null for subtask: " + subtask);
         }
 
         return subtask;
+
     }
 
     @Override
@@ -372,43 +397,7 @@ public class InMemoryTaskManager implements TaskManager{
             }
         }
         return true;
-    } // рабочий метод,
-
-//    @Override
-//    public boolean isIntersection(Task task) {
-//        if (task == null || task.getStartTime() == null || prioritizedTasks.isEmpty()) {
-//            return false;
-//        }
-//
-//        for (Task tasksPrioritized : getPrioritizedTasks()) {
-//            if (Objects.equals(tasksPrioritized.getId(), task.getId())) {
-//                continue;
-//            }
-//
-//            if (task.getType() == TaskType.TASK && tasksPrioritized.getType() == TaskType.TASK) {
-//                if (task.getEndTime().isBefore(tasksPrioritized.getStartTime()) || task.getStartTime().isAfter(tasksPrioritized.getEndTime())) {
-//                    return false;
-//                }
-//            } else if (task.getType() == TaskType.SUBTASK && tasksPrioritized.getType() == TaskType.TASK) {
-//                if (task.getEndTime().isBefore(tasksPrioritized.getStartTime()) || task.getStartTime().isAfter(tasksPrioritized.getEndTime())) {
-//                    return false;
-//                }
-//            } else if (task.getType() == TaskType.TASK && tasksPrioritized.getType() == TaskType.SUBTASK) {
-//                if (task.getEndTime().isBefore(tasksPrioritized.getStartTime()) || task.getStartTime().isAfter(tasksPrioritized.getEndTime())) {
-//                    return false;
-//                }
-//            } else if (task.getType() == TaskType.SUBTASK && tasksPrioritized.getType() == TaskType.SUBTASK) {
-//                if (task.getEndTime().isBefore(tasksPrioritized.getStartTime()) || task.getStartTime().isAfter(tasksPrioritized.getEndTime())) {
-//                    return false;
-//                }
-//            }
-//        }
-//        return true;
-//    } // вроде специально под разные типы задач написал, но не работает
-
-
-
-
+    }
 
     @Override
     public List<Task> getHistory() {

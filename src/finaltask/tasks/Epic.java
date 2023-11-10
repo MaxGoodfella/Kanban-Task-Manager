@@ -9,7 +9,7 @@ import java.util.Objects;
 public class Epic extends Task {
 
     private ArrayList<Integer> subtaskIDs;
-    private LocalDateTime endTime;
+
 
     public ArrayList<Integer> getAllSubtaskIDs() {
         return subtaskIDs;
@@ -34,7 +34,6 @@ public class Epic extends Task {
         this.subtaskIDs = new ArrayList<>();
         this.startTime = startTime;
         this.duration = duration;
-        this.getEndTime();
     }
 
     public Epic(String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration) {
@@ -43,29 +42,37 @@ public class Epic extends Task {
         this.type = TaskType.EPIC;
         this.startTime = startTime;
         this.duration = duration;
-        this.getEndTime();
     }
 
     public TaskStatus getCurrentStatus() {
         return status;
     }
 
+//    public void addSubtaskID(int subtaskID) {
+//        subtaskIDs.add(subtaskID);
+//    }
+
     public void addSubtaskID(int subtaskID) {
-        subtaskIDs.add(subtaskID);
+//        if (subtaskID > 0) {
+//            subtaskIDs.add(subtaskID);
+//        } else {
+//            System.err.println("Попытка добавить недопустимый subtaskID: " + subtaskID);
+//        }
+
+        if (subtaskIDs != null) {
+            if (subtaskID > 0) {
+                subtaskIDs.add(subtaskID);
+            } else {
+                System.err.println("Попытка добавить недопустимый subtaskID: " + subtaskID);
+            }
+        } else {
+            System.err.println("subtaskIDs равен null, не могу выполнить операцию.");
+        }
     }
+
 
     public void removeSubtaskID(int subtaskID) {
         subtaskIDs.remove(Integer.valueOf(subtaskID));
-    }
-
-    @Override
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    @Override
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
     }
 
 

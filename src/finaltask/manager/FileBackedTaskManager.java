@@ -1,6 +1,9 @@
 package finaltask.manager;
 
-import finaltask.tasks.*;
+import finaltask.manager.exceptions.ManagerSaveException;
+import finaltask.tasks.Epic;
+import finaltask.tasks.Subtask;
+import finaltask.tasks.Task;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -94,6 +97,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public Task createTask(Task task) {
         Task t = super.createTask(task);
+        System.out.println("Задача создана: " + task); // отладка
         save();
         return t;
     }
@@ -108,7 +112,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public ArrayList<Task> getAllTasks() {
         ArrayList<Task> alt = super.getAllTasks();
-        save();
+        // save();
         return alt;
     }
 
@@ -148,7 +152,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public ArrayList<Epic> getAllEpics() {
         ArrayList<Epic> ale = super.getAllEpics();
-        save();
+        // save();
         return ale;
     }
 
@@ -200,7 +204,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public ArrayList<Subtask> getAllSubtasks() {
         ArrayList<Subtask> als = super.getAllSubtasks();
-        save();
+        // save();
         return als;
     }
 

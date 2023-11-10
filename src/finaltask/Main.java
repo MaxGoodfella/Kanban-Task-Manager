@@ -1,11 +1,16 @@
 package finaltask;
 
-import finaltask.manager.*;
+import finaltask.manager.HistoryManager;
+import finaltask.manager.KVClient;
+import finaltask.manager.Managers;
+import finaltask.manager.TaskManager;
+import finaltask.server.KVServer;
 import finaltask.tasks.Epic;
 import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
 import finaltask.tasks.TaskStatus;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,7 +18,12 @@ import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+
+        KVServer kvServer = new KVServer();
+        kvServer.start();
+
+
         TaskManager taskManager = Managers.getDefault();
         HistoryManager historyManager = Managers.getHistoryDefault();
 
@@ -55,7 +65,6 @@ public class Main {
         taskManager.calculateEpicEndTime(epic1.getId());
 
 
-
         LocalDateTime epic2StartTime = LocalDateTime.of(2023, 11, 10, 20, 0);
         Duration epic2Duration = Duration.ofMinutes(20);
 
@@ -65,7 +74,6 @@ public class Main {
         taskManager.calculateEpicStartTime(epic2.getId());
         taskManager.calculateEpicDuration(epic2.getId());
         taskManager.calculateEpicEndTime(epic2.getId());
-
 
 
         epic1.addSubtaskID(subtask1_1.getId());
@@ -191,6 +199,7 @@ public class Main {
 
         System.out.println("Сортировка списка задач по времени начала:");
         System.out.println(taskManager.getPrioritizedTasks());
+
 
 
     }
