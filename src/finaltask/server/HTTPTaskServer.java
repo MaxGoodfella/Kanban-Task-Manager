@@ -3,7 +3,6 @@ package finaltask.server;
 import com.google.gson.*;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
-import finaltask.manager.HTTPTaskManager;
 import finaltask.manager.Managers;
 import finaltask.manager.TaskManager;
 import finaltask.tasks.Epic;
@@ -24,7 +23,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class HTTPTaskServer {
 
-    public static final int PORT = 8080;
+    public static final int PORT = 8082;
 
     private HttpServer server;
 
@@ -38,12 +37,12 @@ public class HTTPTaskServer {
 
     public HTTPTaskServer() throws IOException {
         server = HttpServer.create(new InetSocketAddress("localhost", PORT), 0);
-        server.createContext("/tasks/task", this::handler);
-        server.createContext("/tasks/epic", this::handler);
-        server.createContext("/tasks/subtask", this::handler);
-        server.createContext("/tasks/history", this::handler);
+        server.createContext("/tasks/task/", this::handler);
+        server.createContext("/tasks/epic/", this::handler);
+        server.createContext("/tasks/subtask/", this::handler);
+        server.createContext("/tasks/history/", this::handler);
         server.createContext("/tasks/", this::handler);
-        server.createContext("/tasks/subtask/epic", this::handler);
+        server.createContext("/tasks/subtask/epic/", this::handler);
 
 
 
@@ -116,11 +115,19 @@ public class HTTPTaskServer {
                         task = manager.getSubtaskByID(taskId);
                     }
 
+
                     if (task != null) {
-                        jsonResponse.add("task", gson.toJsonTree(task));
+                        if (requestURI.startsWith("/tasks/task/")) {
+                            jsonResponse.add("task", gson.toJsonTree(task));
+                        } else if (requestURI.startsWith("/tasks/epic/")) {
+                            jsonResponse.add("epic", gson.toJsonTree(task));
+                        } else if (requestURI.startsWith("/tasks/subtask/")) {
+                            jsonResponse.add("subtask", gson.toJsonTree(task));
+                        }
                     } else {
                         jsonResponse.addProperty("error", "Задача не найдена");
                     }
+
                 } else {
 
                     if (requestURI.startsWith("/tasks/subtask/epic/")) {
@@ -129,13 +136,13 @@ public class HTTPTaskServer {
                         jsonResponse.add("subtasks", gson.toJsonTree(subtasks));
                     } else {
 
-                        if (requestURI.equals("/tasks/task")) {
+                        if (requestURI.equals("/tasks/task/")) {
                             jsonResponse.add("tasks", gson.toJsonTree(manager.getAllTasks()));
-                        } else if (requestURI.equals("/tasks/epic")) {
+                        } else if (requestURI.equals("/tasks/epic/")) {
                             jsonResponse.add("epics", gson.toJsonTree(manager.getAllEpics()));
-                        } else if (requestURI.equals("/tasks/subtask")) {
+                        } else if (requestURI.equals("/tasks/subtask/")) {
                             jsonResponse.add("subtasks", gson.toJsonTree(manager.getAllSubtasks()));
-                        } else if (requestURI.equals("/tasks/history")) {
+                        } else if (requestURI.equals("/tasks/history/")) {
                             jsonResponse.add("history", gson.toJsonTree(manager.getHistory()));
                         } else if (requestURI.equals("/tasks/")) {
                             jsonResponse.add("prioritized_tasks", gson.toJsonTree(manager.getPrioritizedTasks()));
@@ -320,4 +327,12 @@ public class HTTPTaskServer {
         return new String(h.getRequestBody().readAllBytes(), UTF_8);
     }
 
+    public TaskManager getManager() {
+        return manager;
+    }
+
+
+//    public HTTPTaskManager getManager() {
+//        return manager;
+//    }
 }

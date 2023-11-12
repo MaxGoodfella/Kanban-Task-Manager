@@ -35,7 +35,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.removeAllTasks();
         taskManager.removeAllEpics();
         taskManager.removeAllSubtasks();
-        taskManager.getPrioritizedTasks().clear(); // !
+        taskManager.getPrioritizedTasks().clear();
     }
 
 
@@ -64,8 +64,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task newTask = new Task("Test Task", "Test Task Description");
         taskManager.createTask(newTask);
         assertEquals(newTask, taskManager.getTaskByID(newTask.getId()));
-        // System.out.println(taskManager.getHistory().size());
-        // +1
     }
 
 
@@ -112,8 +110,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertNotNull(updatedTask, "Задача не была обновлена");
         assertEquals("Updated Task", updatedTask.getName(), "Название задачи не обновлено");
         assertEquals("Updated Task Description", updatedTask.getDescription(), "Описание задачи не обновлено");
-
-        // + 1
     }
 
 
@@ -158,7 +154,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Epic createdEpic = taskManager.createEpic(newEpic);
         Epic epic = taskManager.getEpicByID(createdEpic.getId());
         assertEquals(createdEpic, epic);
-        // +1
     }
 
 
@@ -205,7 +200,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertNotNull(updatedEpic, "Эпик не был обновлён");
         assertEquals("Updated Epic", updatedEpic.getName(), "Название эпика не обновлено");
         assertEquals("Updated Epic Description", updatedEpic.getDescription(), "Описание эпика не обновлено");
-    // +1
     }
 
     @Test
@@ -396,7 +390,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         Subtask newSubtask = new Subtask("Test New Subtask", "Test New Subtask Description", TaskStatus.NEW, epic.getId());
         Subtask createdSubtask = taskManager.createSubtask(newSubtask);
-
         assertNotNull(createdSubtask, "Подзадача не найдена.");
         assertEquals(newSubtask, createdSubtask, "Подзадачи не совпадают.");
         assertNotNull(createdSubtask.getId(), "Идентификатор подзадачи не должен быть null");
@@ -417,7 +410,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Subtask createdSubtask = taskManager.createSubtask(newSubtask);
         Subtask subtask = taskManager.getSubtaskByID(createdSubtask.getId());
         assertEquals(createdSubtask, subtask);
-        // +1
     }
 
     @Test
@@ -460,7 +452,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertNotNull(updatedSubtask, "Подзадача не была обновлена");
         assertEquals("Updated Subtask", updatedSubtask.getName(), "Название подзадачи не обновлено");
         assertEquals("Updated Subtask Description", updatedSubtask.getDescription(), "Описание подзадачи не обновлено");
-    // +1
     }
 
 
@@ -509,36 +500,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task historyElement3 = history.get(2);
         assertEquals("Test New Subtask", historyElement3.getName(), "Неверное имя");
         assertEquals("Test New Subtask Description", historyElement3.getDescription(), "Неверное описание");
-
-
-//        int initialHistorySize = taskManager.getHistory().size();
-//
-//        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
-//
-//        Task newTask = new Task("Test New Task", "Test New Task Description");
-//        taskManager.createTask(newTask);
-//        Epic newEpic = new Epic("Test New Epic", "Test New Epic Description");
-//        taskManager.createEpic(newEpic);
-//        Subtask newSubtask = new Subtask("Test New Subtask", "Test New Subtask Description", TaskStatus.NEW, newEpic.getId());
-//        taskManager.createSubtask(newSubtask);
-//
-//        historyManager.addTask(taskManager.getTaskByID(newTask.getId()));
-//        historyManager.addTask(taskManager.getEpicByID(newEpic.getId()));
-//        historyManager.addTask(taskManager.getSubtaskByID(newSubtask.getId()));
-//
-//
-//        int finalHistorySize = taskManager.getHistory().size();
-//
-//        int newHistoryEntries = finalHistorySize - initialHistorySize;
-//
-//        assertEquals(3, newHistoryEntries, "Неверное количество новых записей в истории");
-
-        // здесь сделал немного обходным путём, я не понимаю, почему у меня testGetHistory() работает отдельно, но когда
-        // запускаю его вместе в остальными, он мне плюсует 6 дополнительных элементов.
-        // Я вычислил, что это из-за методов testGetTaskById(), testGetEpicById(), testGetSubtaskById(),
-        // testUpdateTask(), testUpdateEpic() и testUpdateSubtask() - каждый из них даёт по дополнительному элементу.
-        // Но каким образом это происходит - я без понятия.
-        // Подскажи, пожалуйста, почему это происходит? И как мне это исправить?
 
     }
 

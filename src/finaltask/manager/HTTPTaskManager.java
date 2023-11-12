@@ -7,6 +7,7 @@ import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
 
 import java.lang.reflect.Type;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,6 +57,8 @@ public class HTTPTaskManager extends FileBackedTaskManager {
         try {
             String jsonTask = gson.toJson(getAllTasks());
             System.out.println("Сериализация задач завершена");
+            LocalDateTime localDateTime = LocalDateTime.now();
+            System.out.println(localDateTime);
             client.put(TASKS_KEY, jsonTask);
             System.out.println("Задачи успешно сохранены на сервере");
 
