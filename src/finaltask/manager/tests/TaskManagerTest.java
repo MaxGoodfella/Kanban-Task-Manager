@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -427,6 +428,44 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertNotNull(subtasks, "История пустая");
         assertEquals(1, subtasks.size(), "История не соответствует размеру");
         assertEquals(newSubtask, subtasks.get(0), "Эпики не совпадают");
+    }
+
+    @Test
+    void testGetEpicSubtasksByEpicID() {
+
+        Epic epic1 = new Epic("Эпик №1", "Описание эпика №1", TaskStatus.NEW);
+        epic1 = taskManager.createEpic(epic1);
+
+
+        LocalDateTime subtask1_1StartTime = LocalDateTime.of(2023, 11, 10, 15, 0);
+        Duration subtask1_1Duration = Duration.ofMinutes(15);
+        Subtask subtask1_1 = new Subtask("Подзадача №1.1", "Описание подзадачи №1.1", TaskStatus.NEW, epic1.getId(), subtask1_1StartTime, subtask1_1Duration);
+
+        LocalDateTime subtask1_2StartTime = LocalDateTime.of(2023, 11, 10, 15, 30);
+        Duration subtask1_2Duration = Duration.ofMinutes(10);
+        Subtask subtask1_2 = new Subtask("Подзадача №1.2", "Описание подзадачи №1.2", TaskStatus.NEW, epic1.getId(), subtask1_2StartTime, subtask1_2Duration);
+
+        LocalDateTime subtask1_3StartTime = LocalDateTime.of(2023, 11, 10, 16, 0);
+        Duration subtask1_3Duration = Duration.ofMinutes(25);
+        Subtask subtask1_3 = new Subtask("Подзадача №1.3", "Описание подзадачи №1.3", TaskStatus.NEW, epic1.getId(), subtask1_3StartTime, subtask1_3Duration);
+
+        subtask1_1 = taskManager.createSubtask(subtask1_1);
+        subtask1_2 = taskManager.createSubtask(subtask1_2);
+        subtask1_3 = taskManager.createSubtask(subtask1_3);
+
+        taskManager.calculateEpicStartTime(epic1.getId());
+        taskManager.calculateEpicDuration(epic1.getId());
+        taskManager.calculateEpicEndTime(epic1.getId());
+
+        List<Subtask> subtasksOfTheSameEpicExpected = new ArrayList<>();
+        subtasksOfTheSameEpicExpected.add(subtask1_1);
+        subtasksOfTheSameEpicExpected.add(subtask1_2);
+        subtasksOfTheSameEpicExpected.add(subtask1_3);
+
+        List<Subtask> subtasksOfTheSameEpicActual = taskManager.getEpicSubtasksByEpicID(epic1.getId());
+
+        assertEquals(subtasksOfTheSameEpicExpected, subtasksOfTheSameEpicActual, "Списки подзадач, привязанных к определённому эпику, не совпадают");
+
     }
 
     @Test

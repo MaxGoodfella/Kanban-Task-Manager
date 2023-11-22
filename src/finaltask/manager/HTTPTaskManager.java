@@ -2,18 +2,16 @@ package finaltask.manager;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import finaltask.client.KVClient;
 import finaltask.tasks.Epic;
 import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
 
 import java.lang.reflect.Type;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class HTTPTaskManager extends FileBackedTaskManager {
-
-    // почему такое наследование???
 
     private static final String TASKS_KEY = "tasks";
     private static final String EPICS_KEY = "epics";
@@ -21,9 +19,9 @@ public class HTTPTaskManager extends FileBackedTaskManager {
     private static final String HISTORY_KEY = "history";
 
 
-
     private KVClient client;
     private Gson gson;
+
 
     public HTTPTaskManager(String serverURL) {
         super(null, new InMemoryHistoryManager());
@@ -32,53 +30,26 @@ public class HTTPTaskManager extends FileBackedTaskManager {
     }
 
 
-
-
-//        String jsonTask = gson.toJson(getAllTasks());
-//        client.put(TASKS_KEY, jsonTask);
-//
-//        String jsonEpic = gson.toJson(getAllEpics());
-//        client.put(EPICS_KEY, jsonEpic);
-//
-//        String jsonSubtask = gson.toJson(getAllSubtasks());
-//        client.put(SUBTASKS_KEY, jsonSubtask);
-//
-//        List<Integer> historyIDs = historyManager.getHistory().stream()
-//                .map(it -> it.getId())
-//                .collect(Collectors.toList());
-//        String jsonHistoryIDs = gson.toJson(historyIDs);
-//        client.put(HISTORY_KEY, jsonHistoryIDs);
-//
-//        System.out.println("Задачи сохранены на сервере"); // отладка
-
     @Override
     public void save() {
 
         try {
             String jsonTask = gson.toJson(getAllTasks());
-            System.out.println("Сериализация задач завершена");
-            LocalDateTime localDateTime = LocalDateTime.now();
-            System.out.println(localDateTime);
             client.put(TASKS_KEY, jsonTask);
-            System.out.println("Задачи успешно сохранены на сервере");
 
             String jsonEpic = gson.toJson(getAllEpics());
-            System.out.println("Сериализация эпиков завершена");
             client.put(EPICS_KEY, jsonEpic);
-            System.out.println("Эпики успешно сохранены на сервере");
 
             String jsonSubtask = gson.toJson(getAllSubtasks());
-            System.out.println("Сериализация подзадач завершена");
             client.put(SUBTASKS_KEY, jsonSubtask);
-            System.out.println("Подзадачи успешно сохранены на сервере");
 
             List<Integer> historyIDs = historyManager.getHistory().stream()
                     .map(it -> it.getId())
                     .collect(Collectors.toList());
             String jsonHistoryIDs = gson.toJson(historyIDs);
-            System.out.println("Сериализация истории завершена");
             client.put(HISTORY_KEY, jsonHistoryIDs);
-            System.out.println("История успешно сохранена на сервере");
+
+            System.out.println("Задачи сохранены на сервере");
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -10,8 +10,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     @Override
     protected FileBackedTaskManager createTaskManager() {
         InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
-        // File file = new File("/Users/MaximGuseynov/dev3/sprint7/java-kanban/src/resources/sprint7/test.txt");
-        File file = new File("java-kanban/src/resources/sprint7/test.txt"); // сделал вот так, "относительнее" не запускает
+        File file = new File("java-kanban/src/resources/sprint7/test.txt");
         return new FileBackedTaskManager(file, historyManager);
     }
 }

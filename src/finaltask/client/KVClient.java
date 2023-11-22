@@ -1,6 +1,4 @@
-package finaltask.manager;
-
-import finaltask.server.KVServer;
+package finaltask.client;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,13 +13,10 @@ public class KVClient {
     private HttpClient httpClient;
 
     public KVClient(String URL) {
-        // httpClient = HttpClient.newHttpClient();
         apiToken = register();
     }
 
     public String load(String key) {
-
-        // key = {task, epic, subtask, history}
 
         try {
             HttpRequest request = HttpRequest.newBuilder()
@@ -84,7 +79,10 @@ public class KVClient {
         }
     }
 
+
     public static void main(String[] args) {
+
+        // демонстрация работы
 
         KVClient kvClient = new KVClient("http://localhost:8078/");
 

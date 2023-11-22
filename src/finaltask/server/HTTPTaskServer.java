@@ -26,14 +26,11 @@ public class HTTPTaskServer {
     public static final int PORT = 8082;
 
     private HttpServer server;
-
     private TaskManager manager;
-
-    // private HTTPTaskManager manager;
-
     private Gson gson;
 
     private static final Charset CHARSET = StandardCharsets.UTF_8;
+
 
     public HTTPTaskServer() throws IOException {
         server = HttpServer.create(new InetSocketAddress("localhost", PORT), 0);
@@ -44,10 +41,7 @@ public class HTTPTaskServer {
         server.createContext("/tasks/", this::handler);
         server.createContext("/tasks/subtask/epic/", this::handler);
 
-
-
         this.manager = Managers.getDefault();
-
 
         this.gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
@@ -83,9 +77,7 @@ public class HTTPTaskServer {
                 })
                 .create();
 
-
     }
-
 
 
     private void handler(HttpExchange httpExchange) throws IOException {
@@ -102,38 +94,49 @@ public class HTTPTaskServer {
                 JsonObject jsonResponse = new JsonObject();
                 requestURI = httpExchange.getRequestURI().getPath();
 
-                if (httpExchange.getRequestURI().getQuery() != null && httpExchange.getRequestURI().getQuery().startsWith("id=")) {
+                if (requestURI.startsWith("/tasks/subtask/epic/")) {
+                    String query = httpExchange.getRequestURI().getQuery();
 
-                    int taskId = parsePathID(httpExchange.getRequestURI().getQuery());
-                    Task task = null;
+                    if (query != null && query.startsWith("id=")) {
+                        int epicId = parsePathID(query);
+                        List<Subtask> subtasks = manager.getEpicSubtasksByEpicID(epicId);
 
-                    if (requestURI.startsWith("/tasks/task/")) {
-                        task = manager.getTaskByID(taskId);
-                    } else if (requestURI.startsWith("/tasks/epic/")) {
-                        task = manager.getEpicByID(taskId);
-                    } else if (requestURI.startsWith("/tasks/subtask/")) {
-                        task = manager.getSubtaskByID(taskId);
-                    }
-
-
-                    if (task != null) {
-                        if (requestURI.startsWith("/tasks/task/")) {
-                            jsonResponse.add("task", gson.toJsonTree(task));
-                        } else if (requestURI.startsWith("/tasks/epic/")) {
-                            jsonResponse.add("epic", gson.toJsonTree(task));
-                        } else if (requestURI.startsWith("/tasks/subtask/")) {
-                            jsonResponse.add("subtask", gson.toJsonTree(task));
+                        if (!subtasks.isEmpty()) {
+                            jsonResponse.add("subtasks_of_the_same_epic", gson.toJsonTree(subtasks));
+                        } else {
+                            jsonResponse.addProperty("error", "Подзадачи не найдены для указанного эпика");
                         }
                     } else {
-                        jsonResponse.addProperty("error", "Задача не найдена");
+                        jsonResponse.addProperty("error", "Некорректный запрос для подзадач эпика");
                     }
-
                 } else {
 
-                    if (requestURI.startsWith("/tasks/subtask/epic/")) {
-                        int epicId = parsePathID(requestURI);
-                        List<Subtask> subtasks = manager.getEpicSubtasksByEpicID(epicId);
-                        jsonResponse.add("subtasks", gson.toJsonTree(subtasks));
+
+                    if (httpExchange.getRequestURI().getQuery() != null && httpExchange.getRequestURI().getQuery().startsWith("id=")) {
+
+                        int taskId = parsePathID(httpExchange.getRequestURI().getQuery());
+                        Task task = null;
+
+                        if (requestURI.startsWith("/tasks/task/")) {
+                            task = manager.getTaskByID(taskId);
+                        } else if (requestURI.startsWith("/tasks/epic/")) {
+                            task = manager.getEpicByID(taskId);
+                        } else if (requestURI.startsWith("/tasks/subtask/")) {
+                            task = manager.getSubtaskByID(taskId);
+                        }
+
+                        if (task != null) {
+                            if (requestURI.startsWith("/tasks/task/")) {
+                                jsonResponse.add("task", gson.toJsonTree(task));
+                            } else if (requestURI.startsWith("/tasks/epic/")) {
+                                jsonResponse.add("epic", gson.toJsonTree(task));
+                            } else if (requestURI.startsWith("/tasks/subtask/")) {
+                                jsonResponse.add("subtask", gson.toJsonTree(task));
+                            }
+                        } else {
+                            jsonResponse.addProperty("error", "Задача не найдена");
+                        }
+
                     } else {
 
                         if (requestURI.equals("/tasks/task/")) {
@@ -149,6 +152,7 @@ public class HTTPTaskServer {
                         } else {
                             jsonResponse.addProperty("error", "Неизвестный запрос");
                         }
+
                     }
                 }
 
@@ -246,7 +250,7 @@ public class HTTPTaskServer {
                             response = "Эпик удалён успешно";
                         } else {
                             manager.removeAllEpics();
-                            response = "Эпики удалёны успешно";
+                            response = "Эпики удалены успешно";
                         }
                         System.out.println(response);
                     } else if (requestURI.startsWith("/tasks/subtask/") || requestURI.equals("/tasks/subtask")) {
@@ -331,8 +335,4 @@ public class HTTPTaskServer {
         return manager;
     }
 
-
-//    public HTTPTaskManager getManager() {
-//        return manager;
-//    }
 }

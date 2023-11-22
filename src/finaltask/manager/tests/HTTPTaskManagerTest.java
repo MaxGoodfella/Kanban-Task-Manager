@@ -1,5 +1,7 @@
-package finaltask.manager;
+package finaltask.manager.tests;
 
+import finaltask.manager.HTTPTaskManager;
+import finaltask.manager.InMemoryHistoryManager;
 import finaltask.tasks.Epic;
 import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
@@ -15,10 +17,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HTTPTaskManagerTest {
+
     private static HTTPTaskManager httpTaskManager;
 
     InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+
     private static String serverURL = "http://localhost:8078/";
+
 
     @BeforeAll
     public static void setUp() {
@@ -27,8 +32,6 @@ public class HTTPTaskManagerTest {
 
     @Test
     public void testSaveAndLoad() {
-
-        // создали задачи и пр. и бахнули в историю
 
         LocalDateTime task1StartTime = LocalDateTime.of(2023, 11, 10, 11, 30);
         Duration task1Duration = Duration.ofMinutes(20);
@@ -108,23 +111,20 @@ public class HTTPTaskManagerTest {
         historyManager.addTask(httpTaskManager.getSubtaskByID(subtask2_1.getId()));
 
 
-
-        // сохранили на сервер
         httpTaskManager.save();
 
-        // сохранили в листы, чтобы было потом с чем сравнивать
+
         List<Task> expectedTasks = new ArrayList<>(httpTaskManager.getAllTasks());
         List<Epic> expectedEpics = new ArrayList<>(httpTaskManager.getAllEpics());
         List<Subtask> expectedSubtasks = new ArrayList<>(httpTaskManager.getAllSubtasks());
         List<Task> expectedHistory = new ArrayList<>(httpTaskManager.getHistory());
 
 
-        // очистили, чтобы загружать чисто с сервера
         httpTaskManager.taskStorage.clear();
         httpTaskManager.epicStorage.clear();
         httpTaskManager.subtaskStorage.clear();
 
-        // загружаем
+
         httpTaskManager.loadFromServer();
 
 

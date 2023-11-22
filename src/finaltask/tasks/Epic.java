@@ -10,6 +10,7 @@ public class Epic extends Task {
 
     private ArrayList<Integer> subtaskIDs;
 
+    // private LocalDateTime endTime;
 
     public ArrayList<Integer> getAllSubtaskIDs() {
         return subtaskIDs;
@@ -34,6 +35,7 @@ public class Epic extends Task {
         this.subtaskIDs = new ArrayList<>();
         this.startTime = startTime;
         this.duration = duration;
+        // this.getEndTime();
     }
 
     public Epic(String name, String description, TaskStatus status, LocalDateTime startTime, Duration duration) {
@@ -42,6 +44,7 @@ public class Epic extends Task {
         this.type = TaskType.EPIC;
         this.startTime = startTime;
         this.duration = duration;
+        // this.getEndTime();
     }
 
     public TaskStatus getCurrentStatus() {
@@ -66,7 +69,7 @@ public class Epic extends Task {
                 System.err.println("Попытка добавить недопустимый subtaskID: " + subtaskID);
             }
         } else {
-            System.err.println("subtaskIDs равен null, не могу выполнить операцию.");
+            System.err.println("subtaskIDs равен null");
         }
     }
 
@@ -75,6 +78,15 @@ public class Epic extends Task {
         subtaskIDs.remove(Integer.valueOf(subtaskID));
     }
 
+//    @Override
+//    public LocalDateTime getEndTime() {
+//        return endTime;
+//    }
+//
+//    @Override
+//    public void setEndTime(LocalDateTime endTime) {
+//        this.endTime = endTime;
+//    }
 
     @Override
     public boolean equals(Object o) {

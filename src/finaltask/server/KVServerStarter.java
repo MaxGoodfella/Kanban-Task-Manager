@@ -1,4 +1,4 @@
-package finaltask.manager;
+package finaltask.server;
 
 import finaltask.server.KVServer;
 

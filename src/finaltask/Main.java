@@ -1,7 +1,6 @@
 package finaltask;
 
 import finaltask.manager.HistoryManager;
-import finaltask.manager.KVClient;
 import finaltask.manager.Managers;
 import finaltask.manager.TaskManager;
 import finaltask.server.KVServer;
@@ -199,8 +198,6 @@ public class Main {
 
         System.out.println("Сортировка списка задач по времени начала:");
         System.out.println(taskManager.getPrioritizedTasks());
-
-
 
     }
 }

@@ -18,8 +18,6 @@ public class FileBackedTaskManagerChecker {
 
         File file = new File("/Users/MaximGuseynov/dev3/sprint8/java-kanban/src/resources/sprint7/test.txt");
 
-        // вот здесь тоже пытался на относительный поменять, но он не пропускает :(
-
 
         HistoryManager historyManager = new InMemoryHistoryManager();
 
