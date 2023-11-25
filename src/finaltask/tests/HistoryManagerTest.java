@@ -1,16 +1,18 @@
-package finaltask.manager.tests;
+package finaltask.tests;
 
 import finaltask.manager.HistoryManager;
+import finaltask.manager.InMemoryTaskManager;
 import finaltask.manager.Managers;
 import finaltask.manager.TaskManager;
+import finaltask.server.HTTPTaskServer;
+import finaltask.server.KVServer;
 import finaltask.tasks.Epic;
 import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
 import finaltask.tasks.TaskStatus;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,10 +22,22 @@ class HistoryManagerTest {
     private HistoryManager historyManager;
     private TaskManager taskManager;
 
+    private static KVServer kvServer;
+    private static HTTPTaskServer server;
+
     private Task task;
     private Epic epic;
     private Subtask subtask;
 
+
+    @BeforeAll
+    static void init() throws IOException {
+        kvServer = new KVServer();
+        kvServer.start();
+
+        server = new HTTPTaskServer();
+        server.start();
+    }
 
     @BeforeEach
     void setUp() {
@@ -38,6 +52,20 @@ class HistoryManagerTest {
 
         subtask = new Subtask("Subtask 1", "Description 1", TaskStatus.NEW, epic.getId());
         subtask = taskManager.createSubtask(subtask);
+    }
+
+    @AfterAll
+    public static void tearDown() throws InterruptedException {
+        server.stop(0);
+        Thread.sleep(2000);
+        kvServer.stop();
+    }
+
+    @AfterEach
+    void clean() {
+        historyManager.remove(taskManager.removeTaskByID(task.getId()));
+        historyManager.remove(taskManager.removeEpicByID(epic.getId()));
+        historyManager.remove(taskManager.removeSubtaskByID(subtask.getId()));
     }
 
 
@@ -84,9 +112,11 @@ class HistoryManagerTest {
         historyManager.addTask(subtask);
 
         historyManager.remove(taskManager.removeEpicByID(epic.getId()));
+        historyManager.remove(taskManager.removeSubtaskByID(subtask.getId()));
 
 
         List<Task> history = historyManager.getHistory();
+        System.out.println(history);
         assertNotNull(history, "История не пустая");
         assertEquals(1, history.size(), "История не соответствует размеру");
     }
@@ -104,13 +134,6 @@ class HistoryManagerTest {
         assertEquals(task, history.get(0), "Первая задача в истории не соответствует ожиданию");
         assertEquals(epic, history.get(1), "Вторая задача в истории не соответствует ожиданию");
         assertEquals(subtask, history.get(2), "Третья задача в истории не соответствует ожиданию");
-    }
-
-    @AfterEach
-    void clean() {
-        historyManager.remove(taskManager.removeTaskByID(task.getId()));
-        historyManager.remove(taskManager.removeEpicByID(epic.getId()));
-        historyManager.remove(taskManager.removeSubtaskByID(subtask.getId()));
     }
 
 }

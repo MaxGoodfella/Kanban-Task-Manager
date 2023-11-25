@@ -43,12 +43,13 @@ public class KVServer {
                     h.sendResponseHeaders(400, 0);
                     return;
                 }
-                if (!data.containsKey(key)) {
+                String body = data.get(key);
+                if (body == null) {
                     System.out.println("Нельзя достать данные по ключу.");
                     h.sendResponseHeaders(404, 0);
                     return;
                 }
-                sendText(h, data.get(key));
+                sendText(h, body);
                 System.out.println("Успешно отправили значение по ключу");
             } else {
                 System.out.println("/load ждёт GET-запрос, а получил: " + h.getRequestMethod());

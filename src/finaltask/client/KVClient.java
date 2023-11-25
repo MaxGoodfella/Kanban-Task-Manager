@@ -9,12 +9,15 @@ import java.net.http.HttpResponse;
 public class KVClient {
     private static final String URL = "http://localhost:8078/";
 
-    private String apiToken;
+    private final String apiToken;
     private HttpClient httpClient;
 
-    public KVClient(String URL) {
+
+    public KVClient() {
+        httpClient = HttpClient.newHttpClient();
         apiToken = register();
     }
+
 
     public String load(String key) {
 
@@ -64,16 +67,12 @@ public class KVClient {
                     .GET()
                     .build();
 
-            httpClient = HttpClient.newHttpClient();
-
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 200) {
                 throw new RuntimeException("Плохой ответ, не 200, а: " + response.statusCode());
             }
-
-            apiToken = response.body();
-            return apiToken;
+            return response.body();
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Не получается сделать запрос");
         }
@@ -84,7 +83,7 @@ public class KVClient {
 
         // демонстрация работы
 
-        KVClient kvClient = new KVClient("http://localhost:8078/");
+        KVClient kvClient = new KVClient();
 
         String[] keys = {"tasks", "epics", "subtasks", "history"};
 
@@ -117,4 +116,3 @@ public class KVClient {
     }
 
 }
-

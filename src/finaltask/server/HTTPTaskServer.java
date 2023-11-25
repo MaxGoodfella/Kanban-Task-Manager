@@ -1,6 +1,8 @@
 package finaltask.server;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import finaltask.manager.Managers;
@@ -10,13 +12,9 @@ import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -43,39 +41,7 @@ public class HTTPTaskServer {
 
         this.manager = Managers.getDefault();
 
-        this.gson = new GsonBuilder()
-                .registerTypeAdapter(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
-                    @Override
-                    public JsonElement serialize(LocalDateTime localDateTime, Type type, JsonSerializationContext jsonSerializationContext) {
-                        JsonObject jsonObject = new JsonObject();
-                        jsonObject.addProperty("date", localDateTime.toLocalDate().toString());
-                        jsonObject.addProperty("time", localDateTime.toLocalTime().toString());
-                        return jsonObject;
-                    }
-                })
-                .registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
-                    @Override
-                    public LocalDateTime deserialize(JsonElement json, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-                        String dateTimeString = json.getAsString();
-                        return LocalDateTime.parse(dateTimeString, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-                    }
-                })
-                .registerTypeAdapter(Duration.class, new JsonSerializer<Duration>() {
-                    @Override
-                    public JsonElement serialize(Duration duration, Type type, JsonSerializationContext jsonSerializationContext) {
-                        JsonObject jsonObject = new JsonObject();
-                        jsonObject.addProperty("minutes", duration.toMinutes());
-                        return jsonObject;
-                    }
-                })
-                .registerTypeAdapter(Duration.class, new JsonDeserializer<Duration>() {
-                    @Override
-                    public Duration deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
-                        String durationString = jsonElement.getAsString();
-                        return Duration.parse(durationString);
-                    }
-                })
-                .create();
+        this.gson = Managers.getDefaultGson();
 
     }
 
@@ -84,7 +50,6 @@ public class HTTPTaskServer {
 
         String method = httpExchange.getRequestMethod();
         String response;
-        String jsonRequest = readText(httpExchange);
         String requestURI;
 
         switch (method) {
@@ -163,7 +128,15 @@ public class HTTPTaskServer {
 
             case "POST":
 
-                System.out.println("Received JSON request: " + jsonRequest); // отладка
+                String jsonRequest = readText(httpExchange);
+
+                if (jsonRequest.isEmpty()) {
+                    System.out.println("Received an empty request");
+                    httpExchange.sendResponseHeaders(400, 0);
+                    return;
+                } else {
+                    System.out.println("Received JSON request: " + jsonRequest); // отладка
+                }
 
                 try {
                     JsonObject jsonObject = JsonParser.parseString(jsonRequest).getAsJsonObject();
@@ -277,10 +250,10 @@ public class HTTPTaskServer {
             default:
                 response = "Ожидаем GET/POST/DELETE запросы, а получили " + method;
                 System.out.println(response);
+                httpExchange.sendResponseHeaders(405, 0);
                 break;
 
         }
-
 
         sendText(httpExchange, response);
     }

@@ -17,49 +17,62 @@ public class HTTPTaskManager extends FileBackedTaskManager {
     private static final String EPICS_KEY = "epics";
     private static final String SUBTASKS_KEY = "subtasks";
     private static final String HISTORY_KEY = "history";
+    private static final String GENERATED_ID_KEY = "generatedID";
 
 
     private KVClient client;
     private Gson gson;
 
+    private int generatedID;
+
 
     public HTTPTaskManager(String serverURL) {
-        super(null, new InMemoryHistoryManager());
-        this.client = new KVClient(serverURL);
-        this.gson = new Gson();
+        this(serverURL, false, 0); // если false loadFromFile() не вызывается, если true - вызывается
     }
 
+    public HTTPTaskManager(String serverURL, boolean loadFromServer, int initialGeneratedID) {
+        super(null, new InMemoryHistoryManager());
+        this.client = new KVClient();
+        this.gson = new Gson(); // здесь решил оставить как есть, так как способ ниже начинает мне крашить тест)
+//        // this.gson = Managers.getDefaultGson();
+
+        this.generatedID = initialGeneratedID;
+
+        if (loadFromServer) {
+            loadFromServer();
+        }
+    }
+
+    public HistoryManager getHistoryManager() {
+        return historyManager;
+    }
 
     @Override
     public void save() {
 
-        try {
-            String jsonTask = gson.toJson(getAllTasks());
-            client.put(TASKS_KEY, jsonTask);
+        String jsonTask = gson.toJson(getAllTasks());
+        client.put(TASKS_KEY, jsonTask);
 
-            String jsonEpic = gson.toJson(getAllEpics());
-            client.put(EPICS_KEY, jsonEpic);
+        String jsonEpic = gson.toJson(getAllEpics());
+        client.put(EPICS_KEY, jsonEpic);
 
-            String jsonSubtask = gson.toJson(getAllSubtasks());
-            client.put(SUBTASKS_KEY, jsonSubtask);
+        String jsonSubtask = gson.toJson(getAllSubtasks());
+        client.put(SUBTASKS_KEY, jsonSubtask);
 
-            List<Integer> historyIDs = historyManager.getHistory().stream()
-                    .map(it -> it.getId())
-                    .collect(Collectors.toList());
-            String jsonHistoryIDs = gson.toJson(historyIDs);
-            client.put(HISTORY_KEY, jsonHistoryIDs);
+        List<Integer> historyIDs = historyManager.getHistory().stream()
+                .map(Task::getId)
+                .collect(Collectors.toList());
+        String jsonHistoryIDs = gson.toJson(historyIDs);
+        client.put(HISTORY_KEY, jsonHistoryIDs);
 
-            System.out.println("Задачи сохранены на сервере");
+        client.put(GENERATED_ID_KEY, String.valueOf(generatedID));
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Произошла ошибка при сохранении данных на сервере");
-        }
+        System.out.println("Задачи сохранены на сервере");
 
     }
 
 
-    public void loadFromServer() {
+    public void loadFromServer() { // не могу сделать его private или protected, тестовому методу нужен только public
 
         String jsonTasks = client.load(TASKS_KEY);
         String jsonEpics = client.load(EPICS_KEY);
@@ -88,6 +101,9 @@ public class HTTPTaskManager extends FileBackedTaskManager {
 
         List<Integer> historyIDs = gson.fromJson(jsonHistory, List.class);
         historyManager.setHistory(historyIDs);
+
+        String jsonGeneratedID = client.load(GENERATED_ID_KEY);
+        generatedID = Integer.parseInt(jsonGeneratedID);
 
     }
 

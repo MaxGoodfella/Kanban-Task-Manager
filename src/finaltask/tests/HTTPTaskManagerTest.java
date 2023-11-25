@@ -1,14 +1,19 @@
-package finaltask.manager.tests;
+package finaltask.tests;
 
 import finaltask.manager.HTTPTaskManager;
+import finaltask.manager.HistoryManager;
 import finaltask.manager.InMemoryHistoryManager;
+import finaltask.server.HTTPTaskServer;
+import finaltask.server.KVServer;
 import finaltask.tasks.Epic;
 import finaltask.tasks.Subtask;
 import finaltask.tasks.Task;
 import finaltask.tasks.TaskStatus;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,15 +24,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class HTTPTaskManagerTest {
 
     private static HTTPTaskManager httpTaskManager;
+    private static HistoryManager historyManager;
 
-    InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+    private static KVServer kvServer;
+    private static HTTPTaskServer server;
 
     private static String serverURL = "http://localhost:8078/";
 
 
     @BeforeAll
-    public static void setUp() {
-        httpTaskManager = new HTTPTaskManager(serverURL);
+    public static void setUp() throws IOException {
+        kvServer = new KVServer();
+        kvServer.start();
+
+        server = new HTTPTaskServer();
+        server.start();
+
+        httpTaskManager = (HTTPTaskManager) server.getManager();
+        historyManager = httpTaskManager.getHistoryManager();
+    }
+
+    @AfterAll
+    public static void tearDown() throws InterruptedException {
+        server.stop(0);
+        Thread.sleep(2000);
+        kvServer.stop();
     }
 
     @Test

@@ -1,4 +1,4 @@
-package finaltask.manager.tests;
+package finaltask.tests;
 
 import finaltask.manager.HTTPTaskManager;
 import finaltask.manager.InMemoryHistoryManager;

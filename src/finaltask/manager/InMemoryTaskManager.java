@@ -17,6 +17,14 @@ public class InMemoryTaskManager implements TaskManager{
         return ++generatedID;
     }
 
+    public int getGeneratedID() {
+        return generatedID;
+    }
+
+    public void setGeneratedID(int generatedID) {
+        this.generatedID = generatedID;
+    }
+
     public HashMap<Integer, Task> taskStorage = new HashMap<>();
     public HashMap<Integer, Epic> epicStorage = new HashMap<>();
     public HashMap<Integer, Subtask> subtaskStorage = new HashMap<>();
