@@ -12,8 +12,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     private final Map<Integer, Node> nodeMap = new HashMap<>();
 
 
-    private List<Integer> history;
-
     @Override
     public List<Task> getHistory() {
         return getTasks();
@@ -21,7 +19,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void setHistory(List<Integer> history) {
-        this.history = history;
     }
 
     @Override

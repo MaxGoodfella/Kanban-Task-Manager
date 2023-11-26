@@ -23,9 +23,9 @@ public class HTTPTaskServer {
 
     public static final int PORT = 8082;
 
-    private HttpServer server;
-    private TaskManager manager;
-    private Gson gson;
+    private final HttpServer server;
+    private final TaskManager manager;
+    private final Gson gson;
 
     private static final Charset CHARSET = StandardCharsets.UTF_8;
 

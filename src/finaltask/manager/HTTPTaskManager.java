@@ -19,24 +19,23 @@ public class HTTPTaskManager extends FileBackedTaskManager {
     private static final String HISTORY_KEY = "history";
     private static final String GENERATED_ID_KEY = "generatedID";
 
+    private final KVClient client;
+    private final Gson gson;
 
-    private KVClient client;
-    private Gson gson;
-
-    private int generatedID;
+    // private int generatedID;
 
 
     public HTTPTaskManager(String serverURL) {
-        this(serverURL, false, 0); // если false loadFromFile() не вызывается, если true - вызывается
+        this(serverURL, false); // если false loadFromFile() не вызывается, если true - вызывается
     }
 
-    public HTTPTaskManager(String serverURL, boolean loadFromServer, int initialGeneratedID) {
+    public HTTPTaskManager(String serverURL, boolean loadFromServer) {
         super(null, new InMemoryHistoryManager());
         this.client = new KVClient();
         this.gson = new Gson(); // здесь решил оставить как есть, так как способ ниже начинает мне крашить тест)
-//        // this.gson = Managers.getDefaultGson();
+        // this.gson = Managers.getDefaultGson();
 
-        this.generatedID = initialGeneratedID;
+        // this.generatedID = initialGeneratedID;
 
         if (loadFromServer) {
             loadFromServer();
@@ -65,6 +64,13 @@ public class HTTPTaskManager extends FileBackedTaskManager {
         String jsonHistoryIDs = gson.toJson(historyIDs);
         client.put(HISTORY_KEY, jsonHistoryIDs);
 
+        // client.put(GENERATED_ID_KEY, String.valueOf(FileBackedTaskManager.getGeneratedID()));
+
+//        generatedID = getAllTasks().stream()
+//                .mapToInt(Task::getId)
+//                .max()
+//                .orElse(0);
+
         client.put(GENERATED_ID_KEY, String.valueOf(generatedID));
 
         System.out.println("Задачи сохранены на сервере");
@@ -72,7 +78,7 @@ public class HTTPTaskManager extends FileBackedTaskManager {
     }
 
 
-    public void loadFromServer() { // не могу сделать его private или protected, тестовому методу нужен только public
+    private void loadFromServer() {
 
         String jsonTasks = client.load(TASKS_KEY);
         String jsonEpics = client.load(EPICS_KEY);
@@ -99,11 +105,31 @@ public class HTTPTaskManager extends FileBackedTaskManager {
         }
 
 
-        List<Integer> historyIDs = gson.fromJson(jsonHistory, List.class);
-        historyManager.setHistory(historyIDs);
+        // List<Integer> historyIDs = gson.fromJson(jsonHistory, List.class);
+        // historyManager.setHistory(historyIDs);
+
+        List<Integer> historyIDs = gson.fromJson(jsonHistory, new TypeToken<List<Integer>>() {}.getType());
+
+
+        for (Integer taskId : historyIDs) {
+            if (taskStorage.containsKey(taskId)) {
+                historyManager.addTask(taskStorage.get(taskId));
+            } else if (epicStorage.containsKey(taskId)) {
+                historyManager.addTask(epicStorage.get(taskId));
+            } else if (subtaskStorage.containsKey(taskId)) {
+                historyManager.addTask(subtaskStorage.get(taskId));
+            }
+        }
+
+
+
+//        generatedID = tasks.stream()
+//                .mapToInt(Task::getId)
+//                .max()
+//                .orElse(0);
 
         String jsonGeneratedID = client.load(GENERATED_ID_KEY);
-        generatedID = Integer.parseInt(jsonGeneratedID);
+        super.generatedID = Integer.parseInt(jsonGeneratedID);
 
     }
 

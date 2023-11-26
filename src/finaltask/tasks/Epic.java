@@ -51,17 +51,8 @@ public class Epic extends Task {
         return status;
     }
 
-//    public void addSubtaskID(int subtaskID) {
-//        subtaskIDs.add(subtaskID);
-//    }
 
     public void addSubtaskID(int subtaskID) {
-//        if (subtaskID > 0) {
-//            subtaskIDs.add(subtaskID);
-//        } else {
-//            System.err.println("Попытка добавить недопустимый subtaskID: " + subtaskID);
-//        }
-
         if (subtaskIDs != null) {
             if (subtaskID > 0) {
                 subtaskIDs.add(subtaskID);

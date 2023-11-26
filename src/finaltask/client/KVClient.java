@@ -10,7 +10,7 @@ public class KVClient {
     private static final String URL = "http://localhost:8078/";
 
     private final String apiToken;
-    private HttpClient httpClient;
+    private final HttpClient httpClient;
 
 
     public KVClient() {

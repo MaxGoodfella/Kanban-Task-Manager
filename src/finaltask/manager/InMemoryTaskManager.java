@@ -11,23 +11,16 @@ import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager{
 
-    private int generatedID = 0;
+    protected int generatedID = 0;
 
     private int generateID() {
         return ++generatedID;
     }
 
-    public int getGeneratedID() {
-        return generatedID;
-    }
 
-    public void setGeneratedID(int generatedID) {
-        this.generatedID = generatedID;
-    }
-
-    public HashMap<Integer, Task> taskStorage = new HashMap<>();
-    public HashMap<Integer, Epic> epicStorage = new HashMap<>();
-    public HashMap<Integer, Subtask> subtaskStorage = new HashMap<>();
+    protected HashMap<Integer, Task> taskStorage = new HashMap<>();
+    protected HashMap<Integer, Epic> epicStorage = new HashMap<>();
+    protected HashMap<Integer, Subtask> subtaskStorage = new HashMap<>();
 
     protected final HistoryManager historyManager;
 

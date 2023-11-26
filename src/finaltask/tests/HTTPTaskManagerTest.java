@@ -2,8 +2,7 @@ package finaltask.tests;
 
 import finaltask.manager.HTTPTaskManager;
 import finaltask.manager.HistoryManager;
-import finaltask.manager.InMemoryHistoryManager;
-import finaltask.server.HTTPTaskServer;
+import finaltask.manager.Managers;
 import finaltask.server.KVServer;
 import finaltask.tasks.Epic;
 import finaltask.tasks.Subtask;
@@ -16,8 +15,6 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -27,7 +24,6 @@ public class HTTPTaskManagerTest {
     private static HistoryManager historyManager;
 
     private static KVServer kvServer;
-    private static HTTPTaskServer server;
 
     private static String serverURL = "http://localhost:8078/";
 
@@ -37,17 +33,12 @@ public class HTTPTaskManagerTest {
         kvServer = new KVServer();
         kvServer.start();
 
-        server = new HTTPTaskServer();
-        server.start();
-
-        httpTaskManager = (HTTPTaskManager) server.getManager();
+        httpTaskManager = Managers.getDefault();
         historyManager = httpTaskManager.getHistoryManager();
     }
 
     @AfterAll
-    public static void tearDown() throws InterruptedException {
-        server.stop(0);
-        Thread.sleep(2000);
+    public static void tearDown() {
         kvServer.stop();
     }
 
@@ -135,24 +126,23 @@ public class HTTPTaskManagerTest {
         httpTaskManager.save();
 
 
-        List<Task> expectedTasks = new ArrayList<>(httpTaskManager.getAllTasks());
-        List<Epic> expectedEpics = new ArrayList<>(httpTaskManager.getAllEpics());
-        List<Subtask> expectedSubtasks = new ArrayList<>(httpTaskManager.getAllSubtasks());
-        List<Task> expectedHistory = new ArrayList<>(httpTaskManager.getHistory());
+        HTTPTaskManager loadedHttpTaskManager = new HTTPTaskManager(serverURL, true);
+
+        System.out.println(httpTaskManager.getAllTasks());
+        System.out.println(httpTaskManager.getAllEpics());
+        System.out.println(httpTaskManager.getAllSubtasks());
+        System.out.println("!!!!!History: " + httpTaskManager.getHistory());
 
 
-        httpTaskManager.taskStorage.clear();
-        httpTaskManager.epicStorage.clear();
-        httpTaskManager.subtaskStorage.clear();
+        System.out.println(loadedHttpTaskManager.getAllTasks());
+        System.out.println(loadedHttpTaskManager.getAllEpics());
+        System.out.println(loadedHttpTaskManager.getAllSubtasks());
+        System.out.println("!!!!!History: " + loadedHttpTaskManager.getHistory());
 
-
-        httpTaskManager.loadFromServer();
-
-
-        assertEquals(expectedTasks, httpTaskManager.getAllTasks(), "Список задач не совпадает.");
-        assertEquals(expectedEpics, httpTaskManager.getAllEpics(), "Список эпиков не совпадает.");
-        assertEquals(expectedSubtasks, httpTaskManager.getAllSubtasks(), "Список подзадач не совпадает.");
-        assertEquals(expectedHistory, httpTaskManager.getHistory(), "История не совпадает.");
+        assertEquals(httpTaskManager.getAllTasks(), loadedHttpTaskManager.getAllTasks(), "Список задач не совпадает.");
+        assertEquals(httpTaskManager.getAllEpics(), loadedHttpTaskManager.getAllEpics(), "Список эпиков не совпадает.");
+        assertEquals(httpTaskManager.getAllSubtasks(), loadedHttpTaskManager.getAllSubtasks(), "Список подзадач не совпадает.");
+        assertEquals(httpTaskManager.getHistory(), loadedHttpTaskManager.getHistory(), "История не совпадает.");
 
     }
 
